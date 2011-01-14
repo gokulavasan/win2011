@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.LinkedList;
 
 public class ChatServer {
     private static final Charset utf8 = Charset.forName("UTF-8");
@@ -36,6 +37,7 @@ public class ChatServer {
 
     private final int port;
     private final Map<String,ChatState> stateByName = new HashMap<String,ChatState>();
+    private final LinkedList<ChatMessage> worklist = new LinkedList<ChatMessage>();
 
     /** Constructs a new <code>ChatServer</code> that will service requests on
      *  the specified <code>port</code>.  <code>state</code> will be used to
@@ -74,7 +76,17 @@ public class ChatServer {
             else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
                 final String room = m.group(1);
                 final String msg = m.group(2);
+                //Create a new chat message (constructor creates ID based on timestamp)
+                ChatMessage chatmsg = new ChatMessage(room,msg);
+                //Add msg to worklist
+                worklist.addFirst(chatmsg);
+                //Notify
+                worklist.notify();
+
+                //TODO need to remove this
                 getState(room).addMessage(msg);
+
+
                 sendResponse(xo, OK, TEXT, "ack");
             }
             else {
@@ -150,6 +162,5 @@ public class ChatServer {
     /** Runs a chat server, with a default port of 8080. */
     public static void main(final String[] args) throws Exception {
         final int port = args.length == 0 ? 8080 : Integer.parseInt(args[0]);
-        new ChatServer(port).runForever();
     }
 }
