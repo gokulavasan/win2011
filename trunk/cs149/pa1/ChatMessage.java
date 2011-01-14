@@ -1,13 +1,16 @@
 public class ChatMessage {
-  private long ID;
   private String msg;
-  public ChatMessage (final String msg) {
-    this.ID = System.currentTimeMillis();
+  private String room;
+
+  public ChatMessage (final String room, final String msg) {
     this.msg = msg;
+    this.room = room;
   }
-  public long getID () {
-    return this.ID;
+
+  public String getRoom () {
+    return this.room;
   }
+
   public String getMsg () {
     return this.msg;
   }
