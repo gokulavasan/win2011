@@ -56,7 +56,7 @@ public class ChatState {
  
           if (history.size() != 0){
              String msg = "";
-             for (int i = (int)Math.min(lastID - mostRecentSeenID,history.size())-1 ; i > 0; i -- ){
+             for (int i = (int)Math.min(lastID - mostRecentSeenID,history.size())-1 ; i >= 0; i -- ){
                  msg += (lastID-i) + ": " + history.get(i) + "\n";
              }
              return msg;
