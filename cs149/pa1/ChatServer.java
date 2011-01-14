@@ -162,5 +162,6 @@ public class ChatServer {
     /** Runs a chat server, with a default port of 8080. */
     public static void main(final String[] args) throws Exception {
         final int port = args.length == 0 ? 8080 : Integer.parseInt(args[0]);
+        new ChatServer(port).runForever();
     }
 }
