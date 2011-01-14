@@ -79,9 +79,11 @@ public class ChatServer {
                 //Create a new chat message (constructor creates ID based on timestamp)
                 ChatMessage chatmsg = new ChatMessage(room,msg);
                 //Add msg to worklist
+                synchronized (worklist) {
                 worklist.addFirst(chatmsg);
                 //Notify
                 worklist.notify();
+                }
 
                 //TODO need to remove this
                 getState(room).addMessage(msg);
