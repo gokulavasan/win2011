@@ -1,4 +1,4 @@
-public class ChatMessage {
+/*public class ChatMessage {
   private String msg;
   private String room;
 
@@ -14,4 +14,21 @@ public class ChatMessage {
   public String getMsg () {
     return this.msg;
   }
+}
+*/
+
+import java.net.Socket;
+import java.net.ServerSocket;
+
+public class ChatMessage {
+	private final Socket connection;
+	//private final int = timestamp;
+	
+	public ChatMessage (final Socket connection) {
+	this.connection = connection;
+	}
+	
+	public Socket getConnection () {
+		return this.connection;
+	}
 }
