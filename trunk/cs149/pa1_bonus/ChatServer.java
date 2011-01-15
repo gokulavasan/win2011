@@ -51,7 +51,30 @@ public class ChatServer {
 	return state;
     }
 
-
+    class Semaphore {
+	private int count;
+	public Semaphore (int n) {
+		this.count = n;
+	}
+        public reinit(int n) {
+             this.count = n;
+        }
+	public synchronized void decrement () {
+		while (count == 0)  {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
+		}
+		count--;
+	}
+	public synchronized void increment() {
+		count++;
+		notifyAll();
+	}
+    }	
+		
+    private Semaphore allsema;	
 
     public void WorkInit (int numThreads)
     {
@@ -63,6 +86,14 @@ public class ChatServer {
 	    threads[i] = new WorkerThreads();
 	    threads[i].start();
 	}
+    }
+
+    private class AllThread extends Thread
+    {
+       public void run()
+       {
+        
+       }
     }
 
     private class WorkerThreads extends Thread 
@@ -146,6 +177,7 @@ public class ChatServer {
 
     public void runForever() throws Exception {
 	final ServerSocket server = new ServerSocket(port);
+        allsema = new Semaphore(-7);
 	WorkInit(8);
 	while (true) {
 	    final Socket connection = server.accept();
@@ -159,58 +191,6 @@ public class ChatServer {
 	}
     }
 
-    private void handle(final Socket connection) {
-	try {
-	    final BufferedReader xi
-		= new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	    final OutputStream xo = connection.getOutputStream();
-
-	    final String request = xi.readLine();
-	    System.out.println(Thread.currentThread() + ": " + request);
-
-	    Matcher m;
-	    if (PAGE_REQUEST.matcher(request).matches()) {
-		sendResponse(xo, OK, HTML, CHAT_HTML);
-	    }
-	    else if ((m = PULL_REQUEST.matcher(request)).matches()) {
-		final String room = m.group(1);
-		final long last = Long.valueOf(m.group(2));
-		sendResponse(xo, OK, TEXT, getState(room).recentMessages(last));
-	    }
-	    else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
-		final String room = m.group(1);
-		final String msg = m.group(2);
-		//Create a new chat message (constructor creates ID based on timestamp)
-		//ChatMessage chatmsg = new ChatMessage(room,msg);
-		//Add msg to worklist
-		//synchronized (worklist) {
-		//worklist.addFirst(chatmsg);
-		//Notify
-		//worklist.notify();
-		//}
-
-		//TODO need to remove this
-		//getState(room).addMessage(msg);
-
-
-		//sendResponse(xo, OK, TEXT, "ack");
-	    }
-	    else {
-		sendResponse(xo, NOT_FOUND, TEXT, "Nobody here with that name.");
-	    }
-
-	    connection.close();
-	}
-	catch (final Exception xx) {
-	    xx.printStackTrace();
-	    try {
-		connection.close();
-	    }
-	    catch (final Exception yy) {
-		// silently discard any exceptions here
-	    }
-	}
-    }
 
     /** Writes a minimal-but-valid HTML response to <code>output</code>. */
     private static void sendResponse(final OutputStream output,
