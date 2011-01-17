@@ -159,7 +159,7 @@ public class ChatServer {
 	}
     }
 
-    private void handle(final Socket connection) {
+/*    private void handle(final Socket connection) {
 	try {
 	    final BufferedReader xi
 		= new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -211,7 +211,7 @@ public class ChatServer {
 	    }
 	}
     }
-
+*/
     /** Writes a minimal-but-valid HTML response to <code>output</code>. */
     private static void sendResponse(final OutputStream output,
 	    final String status,
