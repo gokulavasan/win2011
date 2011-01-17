@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.LinkedList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class ChatServer {
     private static final Charset utf8 = Charset.forName("UTF-8");
@@ -41,6 +43,7 @@ public class ChatServer {
 
     private int numThreads;
     private WorkerThreads[] threads;
+    private AllThread athread;
 
     private ChatState getState(final String room) {
 	ChatState state = stateByName.get(room);
@@ -56,21 +59,28 @@ public class ChatServer {
 	public Semaphore (int n) {
 		this.count = n;
 	}
-        public reinit(int n) {
+        public void reinit(int n) {
              this.count = n;
         }
 	public synchronized void decrement () {
-		while (count == 0)  {
+		count = -8;
+		notifyAll();
+		try {
+			wait();	
+		} catch (InterruptedException e)
+		{}
+	
+	}
+	public synchronized void increment() {
+		while (count <= 0)
+		{
+			count++;
 			try {
 				wait();
 			} catch (InterruptedException e) {
 			}
 		}
-		count--;
-	}
-	public synchronized void increment() {
-		count++;
-		notifyAll();
+			
 	}
     }	
 		
@@ -80,19 +90,103 @@ public class ChatServer {
     {
 	this.numThreads = numThreads;
 	threads = new WorkerThreads[numThreads];
-
+	athread = new AllThread();
 	for (int i=0; i<numThreads; i++)
 	{
 	    threads[i] = new WorkerThreads();
 	    threads[i].start();
 	}
+	athread.start();
     }
 
     private class AllThread extends Thread
     {
        public void run()
        {
-        
+	while(true)
+        {
+       		ChatMessage newWork;
+		synchronized (worklist)
+		{
+			if (worklist.isEmpty())
+			{
+				System.out.println("\nERROR: All thread invoked but no all-work job! \n");
+				break;
+			}
+			else
+			{
+				newWork = worklist.removeFirst();
+			}
+		}
+		
+		final Socket connection = newWork.getConnection();
+	        try
+		{
+		    //  private void handle(final Socket connection) 
+		    final BufferedReader xi
+			= new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		    final OutputStream xo = connection.getOutputStream();
+		    String allroom = "all";
+		    final String request = xi.readLine();
+		    System.out.println(Thread.currentThread() + ": " + request);
+
+		    Matcher m;
+		    if (PAGE_REQUEST.matcher(request).matches()) {
+		        System.out.println("\nERROR: Chat Html request in all thread\n");	
+			sendResponse(xo, OK, HTML, CHAT_HTML);
+		    }
+		    else if ((m = PULL_REQUEST.matcher(request)).matches()) {
+			final String room = m.group(1);
+			final long last = Long.valueOf(m.group(2));
+			if (room.equals("all"))	
+			{
+			 //sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+			  sendResponse(xo, OK, TEXT, "");
+			}
+			else
+			{
+			 System.out.println("\nERROR: All thread but room not equal to all\n");
+			 //allsema.increment();
+			}
+		    }
+		    else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
+			final String room = m.group(1);
+			final String msg = m.group(2);
+			
+			//ChatServer.this.getState(room).addMessage(msg);
+			Iterator hashIterator = stateByName.keySet().iterator();
+			while(hashIterator.hasNext())
+			{
+				String roomname = (String) hashIterator.next();
+				ChatServer.this.getState(roomname).addMessage(msg);
+			}			
+			if (room.equals("all"))
+			{	
+				sendResponse(xo, OK, TEXT, "ack");
+			}
+			else
+			{
+				System.out.println("\nERROR: All thread but room not equal to all\n");
+				//allsema.decrement();
+			}
+		    }
+		    else {
+			sendResponse(xo, NOT_FOUND, TEXT, "Nobody here with that name.");
+		    }
+
+		    connection.close();
+		}
+		catch (final Exception xx) {
+		    xx.printStackTrace();
+		    try {
+			connection.close();
+		    }
+		    catch (final Exception yy) {
+			// silently discard any exceptions here
+		    }
+		}	 
+		allsema.decrement();
+         }
        }
     }
 
@@ -125,7 +219,7 @@ public class ChatServer {
 		    final BufferedReader xi
 			= new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		    final OutputStream xo = connection.getOutputStream();
-
+		    String allroom = "all";
 		    final String request = xi.readLine();
 		    System.out.println(Thread.currentThread() + ": " + request);
 
@@ -136,16 +230,28 @@ public class ChatServer {
 		    else if ((m = PULL_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final long last = Long.valueOf(m.group(2));
-			sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+			if (room.equals(allroom))	
+			{
+				allsema.increment();
+			}
+			else
+			{
+				sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+			}
 		    }
 		    else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final String msg = m.group(2);
 
-			ChatServer.this.getState(room).addMessage(msg);
-
-
-			sendResponse(xo, OK, TEXT, "ack");
+			if (room.equals(allroom))
+			{
+                        	allsema.decrement();
+                        }
+			else
+                        {
+				ChatServer.this.getState(room).addMessage(msg);
+				sendResponse(xo, OK, TEXT, "ack");
+			}
 		    }
 		    else {
 			sendResponse(xo, NOT_FOUND, TEXT, "Nobody here with that name.");
@@ -177,6 +283,7 @@ public class ChatServer {
 
     public void runForever() throws Exception {
 	final ServerSocket server = new ServerSocket(port);
+		
         allsema = new Semaphore(-7);
 	WorkInit(8);
 	while (true) {
@@ -231,6 +338,7 @@ public class ChatServer {
 	    try {
 		xi.close();
 	    } catch (final IOException xx) {
+		System.out.println("\nI am facing a problem here!\n");
 		// discard
 	    }
 	}
