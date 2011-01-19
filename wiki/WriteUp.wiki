@@ -1,0 +1,18 @@
+The design implements a chat room server with the optional 'All' chat room. The major key points are as follows.
+
+i. addMessage and recentMessages methods were added to the ChatState class. 
+ii. ThreadPool of 8 worker threads were implemented.
+iii. All chat room functionality was implemented
+iv. Synchronization was done at a coarse level for simplicity and ease of design - each worker thread synchronizes over the HashMap object.
+
+The design points are explained as follows.
+
+i. addMessage - Checks whether the history linkedlist in the chatroom is of max size - if not adds the message (also increments the message ID) and if it is full removes the last message.
+
+recentMessages - wait(TIMEOUT) method is used to wait over the History linkedlist for 15 seconds if the ID is bigger than the last seen ID else returns the messages with the ID numbers concatenated with new line characters.
+
+ii. ThreadPool - WorkerThread class is created to work on the job added to the job list. It basically implements the handle method in the starter code. The runforever method adds new job to the JobQueue with the Socket Connection (ChatMessage class object has a member of type Socket). WorkInit function starts 8 worker threads. The workerThread synchronizes over jobQ to remove a job from the linkedlist. Then it does the job of the handle method in the started code.
+
+iii. All chat room - All chat room is added as a separate room in the HashMap. The workerThread recognizes that the request goes to a ALL chat room in which case - if it is a Push, the message is added to all rooms using a HashMap Iterator - if it is a pull, the messages are retrieved from the ALL chat room. In the case of push to ordinary chat room, the message is added to both the original chatroom and the ALL chat room.
+
+iv. Coarse Synchronization - All the worker threads acquire a lock over the HashMap object before proceeding to do the requested task.
