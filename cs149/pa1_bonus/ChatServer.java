@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 import java.util.LinkedList;
 import java.util.Collection;
 import java.util.Iterator;
-
+import java.util.*;
+import java.util.concurrent.*;
 public class ChatServer {
     private static final Charset utf8 = Charset.forName("UTF-8");
 
@@ -53,7 +54,7 @@ public class ChatServer {
 	}
 	return state;
     }
-
+/*
     class Semaphore {
 	private int count;
 	public Semaphore (int n) {
@@ -83,14 +84,17 @@ public class ChatServer {
 			
 	}
     }	
-		
-    private Semaphore allsema;	
+*/		
+    private Semaphore waitForAllSema;	
+    private Semaphore waitOnAllSema;	
 
     public void WorkInit (int numThreads)
     {
 	this.numThreads = numThreads;
 	threads = new WorkerThreads[numThreads];
 	athread = new AllThread();
+        waitForAllSema = new Semaphore (0,true);
+        waitOnAllSema = new Semaphore (0,true);
 	for (int i=0; i<numThreads; i++)
 	{
 	    threads[i] = new WorkerThreads();
@@ -146,6 +150,8 @@ public class ChatServer {
 			else
 			{
 			 System.out.println("\nERROR: All thread but room not equal to all\n");
+                         waitOnAllSema.release(numThreads);
+                         waitForAllSema.acquire(numThreads);
 			 //allsema.increment();
 			}
 		    }
@@ -167,6 +173,9 @@ public class ChatServer {
 			else
 			{
 				System.out.println("\nERROR: All thread but room not equal to all\n");
+
+                         waitOnAllSema.release(numThreads);
+                         waitForAllSema.acquire(numThreads);
 				//allsema.decrement();
 			}
 		    }
@@ -185,7 +194,7 @@ public class ChatServer {
 			// silently discard any exceptions here
 		    }
 		}	 
-		allsema.decrement();
+		//allsema.decrement();
          }
        }
     }
@@ -232,7 +241,8 @@ public class ChatServer {
 			final long last = Long.valueOf(m.group(2));
 			if (room.equals(allroom))	
 			{
-				allsema.increment();
+                               waitForAllSema.release(1);
+                               waitOnAllSema.acquire(1);
 			}
 			else
 			{
@@ -245,7 +255,8 @@ public class ChatServer {
 
 			if (room.equals(allroom))
 			{
-                        	allsema.decrement();
+                               waitForAllSema.release(1);
+                               waitOnAllSema.acquire(1);
                         }
 			else
                         {
@@ -280,11 +291,10 @@ public class ChatServer {
     public ChatServer(final int port) throws IOException {
 	this.port = port;
     }
-
+    
     public void runForever() throws Exception {
 	final ServerSocket server = new ServerSocket(port);
-		
-        allsema = new Semaphore(-7);
+        //allsema = new Semaphore(-7);
 	WorkInit(8);
 	while (true) {
 	    final Socket connection = server.accept();
