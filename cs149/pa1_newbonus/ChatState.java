@@ -28,7 +28,7 @@ public class ChatState {
           }
           history.addFirst(chatmsg);
           lastID++;
-          history.notify();
+          history.notifyAll();
         }
     }
 
@@ -44,7 +44,7 @@ public class ChatState {
     */
     // TODO don't know if messages are supposed to be returned most recent first or not
     public String recentMessages(long mostRecentSeenID) {
-      //  synchronized (history) {
+        synchronized (history) {
           //With the history locked, check if empty or if we have any new msgs from
           if (history.size() == 0 || lastID <= mostRecentSeenID){
              try {
@@ -61,7 +61,7 @@ public class ChatState {
              }
              return msg;
           }
-       //}
+        }
         return null;
     }
 }

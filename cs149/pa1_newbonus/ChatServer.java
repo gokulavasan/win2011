@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.Collection;
 
 public class ChatServer {
     private static final Charset utf8 = Charset.forName("UTF-8");
@@ -105,16 +107,32 @@ public class ChatServer {
 		    else if ((m = PULL_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final long last = Long.valueOf(m.group(2));
-                        synchronized (stateByName) {
-			  sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+                        ChatState state;
+                        synchronized (ChatServer.this.stateByName){
+                            state = ChatServer.this.getState(room);
                         }
+			sendResponse(xo, OK, TEXT, state.recentMessages(last));
 		    }
 		    else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final String msg = m.group(2);
-                        synchronized (stateByName) {
-			  ChatServer.this.getState(room).addMessage(msg);
+                        synchronized (ChatServer.this.stateByName){
+			  ChatServer.this.getState("ALL").addMessage(room+"--"+msg);
+
+                          if (room.equals("ALL")){
+ 		             Iterator hashIterator = stateByName.keySet().iterator();
+                             while(hashIterator.hasNext())
+                             {
+                                String newroom = (String)hashIterator.next();
+                                if (! newroom.equals ("ALL")){
+			          ChatServer.this.getState(newroom).addMessage(room+"--"+msg);
+                                }
+                             }
+                          } else {
+			    ChatServer.this.getState(room).addMessage(msg);
+                          }
                         }
+
 
 			sendResponse(xo, OK, TEXT, "ack");
 		    }
