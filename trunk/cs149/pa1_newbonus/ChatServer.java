@@ -105,14 +105,16 @@ public class ChatServer {
 		    else if ((m = PULL_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final long last = Long.valueOf(m.group(2));
-			sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+                        synchronized (stateByName) {
+			  sendResponse(xo, OK, TEXT, ChatServer.this.getState(room).recentMessages(last));
+                        }
 		    }
 		    else if ((m = PUSH_REQUEST.matcher(request)).matches()) {
 			final String room = m.group(1);
 			final String msg = m.group(2);
-
-			ChatServer.this.getState(room).addMessage(msg);
-
+                        synchronized (stateByName) {
+			  ChatServer.this.getState(room).addMessage(msg);
+                        }
 
 			sendResponse(xo, OK, TEXT, "ack");
 		    }
