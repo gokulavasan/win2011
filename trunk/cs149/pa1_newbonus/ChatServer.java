@@ -86,7 +86,7 @@ public class ChatServer {
 			{
 			}
 		    }
-		    newWork = worklist.removeFirst();	
+		    newWork = worklist.removeLast();	
 		}
 
 		final Socket connection = newWork.getConnection();
