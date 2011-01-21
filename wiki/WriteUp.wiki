@@ -17,7 +17,9 @@ iii. "ALL" chat room - "ALL" chat room is added as a separate room in the HashMa
 
 iv. Synchronization - The key structures that needed to be synchronized were:
   a) ThreadPool (ChatServer) - Every thread needs to gain ownership of this structure to query the worklist for pending work.  If no pending work exists, the thread blocks on the structure.  The runForever main method also synchronizes on the worklist to add requests to it, notifying blocked threads when something comes in.
+  
   b) StateByName (ChatServer) - All threads process requests and need to check rooms.  When a room does not exist, the threads add to the hash. This process needs to be synchronized on StateByName.  Key difference between reads and writes.  
        Reads only need to synchronize the query and add room functionality, and should not block other threads.  
        Writes need to hold the StateByName lock for either inserting to every existing room if directed at 'ALL', or the room and 'ALL' if targeting a specific room.
+  
   c) History (ChatState) - addMessage and recentMessages need to synchronize access to this data structure.  The process has been described in section (i)
