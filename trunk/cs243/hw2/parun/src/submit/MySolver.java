@@ -61,7 +61,8 @@ public class MySolver implements Flow.Solver {
 				Iterator preIter = iter.predecessors();
 				if (preIter == null)
 				{
-					
+				//System.out.println("\n\tSuccessors : " + newQ.getID() + "\n");
+				  tempDfOIn.meetWith(analysis.getEntry());
 				}
 				else
 				{
@@ -71,16 +72,19 @@ public class MySolver implements Flow.Solver {
 						Quad newQ = (Quad) preIter.next();
 						if (newQ != null)
 						{
-							i++;
+							//i++;
 							//System.out.println("\n\tSuccessors : " + newQ.getID() + "\n");
 							tempDfOIn.meetWith(analysis.getOut(newQ));
-						}
+						} else {
+				                     tempDfOIn.meetWith(analysis.getEntry());
+
+                                                }
 					}
 					//if (i!=0)
 					//{
-						analysis.setIn(quad, tempDfOIn);
 					//}
 				}
+				analysis.setIn(quad, tempDfOIn);
 				
 			} 
 			catch (Exception e)
@@ -100,9 +104,9 @@ public class MySolver implements Flow.Solver {
 				onceMore = true;
 			}	
 
+                analysis.setExit(analysis.getOut(quad));
 		}	
 	}
-
 		
         // this needs to come last.
         analysis.postprocess(cfg);
