@@ -41,74 +41,81 @@ public class MySolver implements Flow.Solver {
          * Your code goes here *
          ***********************/
 
-	while(onceMore)
+	do
 	{
-		//System.out.println("\nEntering iteration!\n");
-		onceMore = false;
-		QuadIterator iter = new QuadIterator(cfg, analysis.isForward());
-		//Quad tempq = iter.next();
-		while (iter.hasNext())
-		{
-			Quad quad = iter.next();
-			//System.out.println("\nAnalysing Quad : " + quad.getID() + "\n");
-				
-			Flow.DataflowObject DfOIn = analysis.getIn(quad);
-			Flow.DataflowObject DfOOut = analysis.getOut(quad);
-	
-			Flow.DataflowObject tempDfOIn = analysis.newTempVar();
+	    //System.out.println("\nEntering iteration!\n");
+	    onceMore = false;
+	    QuadIterator iter = new QuadIterator(cfg, analysis.isForward());
+	    //Quad tempq = iter.next();
+	    while (analysis.isForward() ? iter.hasNext() : iter.hasPrevious())
+	    {
+		Quad quad = analysis.isForward() ? iter.next() : iter.previous();
+		//System.out.println("\nAnalysing Quad : " + quad.getID() + "\n");
 
-			try {
-				Iterator preIter = iter.predecessors();
-				if (preIter == null)
-				{
+		Flow.DataflowObject DfOIn = analysis.getIn(quad);
+		Flow.DataflowObject DfOOut = analysis.getOut(quad);
+
+		Flow.DataflowObject tempDf = analysis.newTempVar();
+
+		try {
+		    Iterator meetIter = (analysis.isForward() ? 
+                                             iter.predecessors() : iter.successors());
+		    if (meetIter == null)
+		    {
+			//System.out.println("\n\tSuccessors : " + newQ.getID() + "\n");
+			tempDf.meetWith(
+                          analysis.isForward() ? analysis.getEntry() : analysis.getExit()
+                          );
+		    }
+		    else
+		    {
+			//int i = 0;
+			while ( meetIter.hasNext())
+			{
+			    Quad newQ = (Quad) (meetIter.next()) ;
+			    if (newQ != null)
+			    {
+				//i++;
 				//System.out.println("\n\tSuccessors : " + newQ.getID() + "\n");
-				  tempDfOIn.meetWith(analysis.getEntry());
-				}
-				else
-				{
-					//int i = 0;
-					while (preIter.hasNext())
-					{
-						Quad newQ = (Quad) preIter.next();
-						if (newQ != null)
-						{
-							//i++;
-							//System.out.println("\n\tSuccessors : " + newQ.getID() + "\n");
-							tempDfOIn.meetWith(analysis.getOut(newQ));
-						} else {
-				                     tempDfOIn.meetWith(analysis.getEntry());
+				tempDf.meetWith(analysis.isForward() ? 
+                                                       analysis.getOut(newQ) : analysis.getIn(newQ)
+                                                  );
+			    } else {
+				tempDf.meetWith(analysis.isForward() ? 
+                                                       analysis.getEntry() : analysis.getExit()
+                                                  );
 
-                                                }
-					}
-					//if (i!=0)
-					//{
-					//}
-				}
-				analysis.setIn(quad, tempDfOIn);
-				
-			} 
-			catch (Exception e)
-			{ 
-				System.out.println(e.getMessage()); 
+			    }
 			}
-			
-			
-			analysis.processQuad(quad);
-			
-			if (DfOOut.equals(analysis.getOut(quad)))
-			{
-				continue;
-			}
-			else
-			{
-				onceMore = true;
-			}	
+			//if (i!=0)
+			//{
+			//}
+		    }
+                    if (analysis.isForward()){
+		      analysis.setIn(quad, tempDf);
+                    } else {
+                      analysis.setOut(quad,tempDf);
+                    }
 
-                analysis.setExit(analysis.getOut(quad));
+		} 
+		catch (Exception e)
+		{ 
+		    System.out.println(e.getMessage()); 
+		}
+
+                 analysis.processQuad(quad);
+                if (!(DfOOut.equals(analysis.getOut(quad))) || !(DfOIn.equals(analysis.getIn(quad)))){
+		    onceMore = true;
 		}	
-	}
-		
-        // this needs to come last.
-        analysis.postprocess(cfg);
+                if (analysis.isForward()){
+		  analysis.setExit(analysis.getOut(quad));
+                }  else { 
+		  analysis.setEntry(analysis.getIn(quad));
+                }
+	    }	
+	} while (onceMore);
+
+	// this needs to come last.
+	analysis.postprocess(cfg);
     }
 }
