@@ -1,8 +1,19 @@
 bin/parun flow.Flow submit.MySolver flow.ConstantProp test.Test | tee test.cp.log
 bin/parun flow.Flow submit.MySolver flow.Liveness test.Test | tee test.live.log
+
+bin/parun flow.Flow submit.MySolver flow.ConstantProp test.TestTwo | tee test2.cp.log
+bin/parun flow.Flow submit.MySolver flow.Liveness test.TestTwo | tee test2.live.log
+
 echo "Diffing test cp output"
 echo "diff test.cp.log src/test/test.cp.out"
 diff test.cp.log src/test/test.cp.out
 echo "Diffing test liveness output"
 echo "diff test.live.log src/test/test.lv.out"
 diff test.live.log src/test/test.lv.out
+
+echo "Diffing test2 cp output"
+echo "diff test2.cp.log src/test/test2.cp.out"
+diff test2.cp.log src/test/test2.cp.out
+echo "Diffing test2 liveness output"
+echo "diff test2.live.log src/test/test2.lv.out"
+diff test2.live.log src/test/test2.lv.out
