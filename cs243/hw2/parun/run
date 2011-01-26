@@ -9,37 +9,37 @@ bin/parun flow.Flow submit.MySolver submit.ReachingDefs test.TestTwo | tee test2
 
 
 
-echo "Diffing test cp output"
+echo "\n\nDiffing test cp output"
 echo "diff test.cp.log src/test/test.cp.out"
 diff test.cp.log src/test/test.cp.out
 
-echo "Diffing test liveness output"
+echo "\n\nDiffing test liveness output"
 echo "diff test.live.log src/test/test.lv.out"
 diff test.live.log src/test/test.lv.out
 
-echo "Diffing test ReachDef output"
+echo "\n\nDiffing test ReachDef output"
 echo "diff test.rd.log src/test/test.rd.out"
 diff test.rd.log src/test/test.rd.out
 
-echo "Diffing test ReachDef output noexn"
+echo "\n\nDiffing test ReachDef output noexn"
 echo "diff test.rd.log src/test/test.rd.out.noexn"
 diff test.rd.log src/test/test.rd.out.noexn
 
 
 
-echo "Diffing test2 cp output"
+echo "\n\nDiffing test2 cp output"
 echo "diff test2.cp.log src/test/test2.cp.out"
 diff test2.cp.log src/test/test2.cp.out
 
-echo "Diffing test2 liveness output"
+echo "\n\nDiffing test2 liveness output"
 echo "diff test2.live.log src/test/test2.lv.out"
 diff test2.live.log src/test/test2.lv.out
 
-echo "Diffing test2 ReachDef output"
+echo "\n\nDiffing test2 ReachDef output"
 echo "diff test2.rd.log src/test/test2.rd.out"
 diff test2.rd.log src/test/test2.rd.out
 
-echo "Diffing test2 ReachDef output noexn"
+echo "\n\nDiffing test2 ReachDef output noexn"
 echo "diff test2.rd.log src/test/test2.rd.out.noexn"
 diff test2.rd.log src/test/test2.rd.out.noexn
 
