@@ -1,2 +1,7 @@
 javac -cp deuceAgent-1.2.0.jar `find . -name '*.java'`
-java -javaagent:deuceAgent-1.2.0.jar -cp . Main
+echo "\n\nRunning --key-range=1000 --read-pct=99\n"
+java -javaagent:deuceAgent-1.2.0.jar -cp . Main --key-range=1000 --read-pct=99
+echo "\n\nRunning --key-range=10000 --read-pct=95\n"
+java -javaagent:deuceAgent-1.2.0.jar -cp . Main --key-range=10000 --read-pct=95
+echo "\n\nRunning --key-range=1000000 --read-pct=0\n"
+java -javaagent:deuceAgent-1.2.0.jar -cp . Main --key-range=1000000 --read-pct=0

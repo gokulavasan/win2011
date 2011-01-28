@@ -1,0 +1,1 @@
+jsub -l nodes=1:h23:ppn=8 -- source run
