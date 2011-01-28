@@ -11,7 +11,6 @@ public class STMTreap implements IntSet {
             this.key = key;
             this.priority = priority;
         }
-
         public String toString() {
             return "Node[key=" + key + ", prio=" + priority +
                     ", left=" + (left == null ? "null" : String.valueOf(left.key)) +
@@ -25,22 +24,42 @@ public class STMTreap implements IntSet {
     @org.deuce.Atomic
     public boolean  contains (final int key)
     {
-        Node node = root;
-        while (node != null) {
-            if (key == node.key) {
-                return true;
-            }
-            node = key < node.key ? node.left : node.right;
+        return containsRecursive (root,key);
+    }
+
+    public boolean  containsRecursive (final Node node, final int key)
+    {
+        if (node == null){
+          return false;
         }
-        return false;
+        if (key == node.key) {
+            return true;
+        }
+        if ( key < node.key) {
+           if (node.left == null){
+             return false;
+           } else {
+             return  containsRecursive(node.left,key);
+           }
+        } else {
+          if (node.right == null){
+             return false;
+           } else {
+             return  containsRecursive(node.right,key);
+           } 
+        }
     }
 
     @org.deuce.Atomic
     public void add(final int key) {
-        root = addImpl(root, key);
+        Node temp = addImpl(root, key);
+        if (temp != root){
+          root = temp;
+        }
     }
 
     private Node addImpl(final Node node, final int key) {
+        Node temp;
         if (node == null) {
             return new Node(key, randPriority());
         }
@@ -49,14 +68,20 @@ public class STMTreap implements IntSet {
             return node;
         }
         else if (key < node.key) {
-            node.left = addImpl(node.left, key);
+            temp = addImpl(node.left, key);
+            if (node.left != temp){
+              node.left = temp;
+            }
             if (node.left.priority > node.priority) {
                 return rotateRight(node);
             }
             return node;
         }
         else {
-            node.right = addImpl(node.right, key);
+            temp = addImpl(node.right, key);
+            if (node.right != temp){
+              node.right = temp;
+            }
             if (node.right.priority > node.priority) {
                 return rotateLeft(node);
             }
@@ -92,10 +117,14 @@ public class STMTreap implements IntSet {
 
     @org.deuce.Atomic
     public void remove(final int key) {
-        root = removeImpl(root, key);
+        Node temp = removeImpl(root, key);
+        if (temp != root){
+          root = temp;
+        }
     }
 
     private Node removeImpl(final Node node, final int key) {
+        Node temp;
         if (node == null) {
             // not present, nothing to do
             return null;
@@ -125,11 +154,17 @@ public class STMTreap implements IntSet {
             }
         }
         else if (key < node.key) {
-            node.left = removeImpl(node.left, key);
+            temp = removeImpl(node.left, key);
+            if (node.left != temp){
+              node.left = temp;
+            }
             return node;
         }
         else {
-            node.right = removeImpl(node.right, key);
+            temp = removeImpl(node.right, key);
+            if (node.right != temp){
+              node.right = temp;
+            }
             return node;
         }
     }

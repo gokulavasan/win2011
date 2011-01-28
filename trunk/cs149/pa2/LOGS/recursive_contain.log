@@ -1,0 +1,69 @@
+\n\nRunning --key-range=1000 --read-pct=99\n
+---------- warmup
+ 1 threads,  CoarseLockTreap, range 1000, 99% read:   5816291 operations/sec
+ 2 threads,  CoarseLockTreap, range 1000, 99% read:   1422264 operations/sec
+ 4 threads,  CoarseLockTreap, range 1000, 99% read:   1706802 operations/sec
+ 8 threads,  CoarseLockTreap, range 1000, 99% read:   1859508 operations/sec
+16 threads,  CoarseLockTreap, range 1000, 99% read:   2985644 operations/sec
+ 1 threads,         STMTreap, range 1000, 99% read:   1031761 operations/sec
+ 2 threads,         STMTreap, range 1000, 99% read:   2572819 operations/sec
+ 4 threads,         STMTreap, range 1000, 99% read:   4728999 operations/sec
+ 8 threads,         STMTreap, range 1000, 99% read:   7165378 operations/sec
+16 threads,         STMTreap, range 1000, 99% read:   4273832 operations/sec
+---------- timed run
+ 1 threads,  CoarseLockTreap, range 1000, 99% read:   5747075 operations/sec
+ 2 threads,  CoarseLockTreap, range 1000, 99% read:   1979575 operations/sec
+ 4 threads,  CoarseLockTreap, range 1000, 99% read:   1717643 operations/sec
+ 8 threads,  CoarseLockTreap, range 1000, 99% read:   1812924 operations/sec
+16 threads,  CoarseLockTreap, range 1000, 99% read:   3081463 operations/sec
+ 1 threads,         STMTreap, range 1000, 99% read:   1678748 operations/sec
+ 2 threads,         STMTreap, range 1000, 99% read:   2717057 operations/sec
+ 4 threads,         STMTreap, range 1000, 99% read:   3779823 operations/sec
+ 8 threads,         STMTreap, range 1000, 99% read:   5662308 operations/sec
+16 threads,         STMTreap, range 1000, 99% read:   3855917 operations/sec
+\n\nRunning --key-range=10000 --read-pct=95\n
+---------- warmup
+ 1 threads,  CoarseLockTreap, range 10000, 95% read:   4106409 operations/sec
+ 2 threads,  CoarseLockTreap, range 10000, 95% read:    982320 operations/sec
+ 4 threads,  CoarseLockTreap, range 10000, 95% read:    965425 operations/sec
+ 8 threads,  CoarseLockTreap, range 10000, 95% read:   1125737 operations/sec
+16 threads,  CoarseLockTreap, range 10000, 95% read:   1902821 operations/sec
+ 1 threads,         STMTreap, range 10000, 95% read:    606286 operations/sec
+ 2 threads,         STMTreap, range 10000, 95% read:   1013295 operations/sec
+ 4 threads,         STMTreap, range 10000, 95% read:   1538982 operations/sec
+ 8 threads,         STMTreap, range 10000, 95% read:   1609369 operations/sec
+16 threads,         STMTreap, range 10000, 95% read:    576989 operations/sec
+---------- timed run
+ 1 threads,  CoarseLockTreap, range 10000, 95% read:   3961902 operations/sec
+ 2 threads,  CoarseLockTreap, range 10000, 95% read:   1069021 operations/sec
+ 4 threads,  CoarseLockTreap, range 10000, 95% read:   1012763 operations/sec
+ 8 threads,  CoarseLockTreap, range 10000, 95% read:   1004813 operations/sec
+16 threads,  CoarseLockTreap, range 10000, 95% read:   1825894 operations/sec
+ 1 threads,         STMTreap, range 10000, 95% read:    841699 operations/sec
+ 2 threads,         STMTreap, range 10000, 95% read:   1121813 operations/sec
+ 4 threads,         STMTreap, range 10000, 95% read:   1505510 operations/sec
+ 8 threads,         STMTreap, range 10000, 95% read:   1606721 operations/sec
+16 threads,         STMTreap, range 10000, 95% read:    644757 operations/sec
+\n\nRunning --key-range=1000000 --read-pct=0\n
+---------- warmup
+ 1 threads,  CoarseLockTreap, range 1000000, 0% read:    921147 operations/sec
+ 2 threads,  CoarseLockTreap, range 1000000, 0% read:    278321 operations/sec
+ 4 threads,  CoarseLockTreap, range 1000000, 0% read:    274537 operations/sec
+ 8 threads,  CoarseLockTreap, range 1000000, 0% read:    270628 operations/sec
+16 threads,  CoarseLockTreap, range 1000000, 0% read:    273219 operations/sec
+ 1 threads,         STMTreap, range 1000000, 0% read:     93072 operations/sec
+ 2 threads,         STMTreap, range 1000000, 0% read:    103364 operations/sec
+ 4 threads,         STMTreap, range 1000000, 0% read:     91169 operations/sec
+ 8 threads,         STMTreap, range 1000000, 0% read:     78239 operations/sec
+16 threads,         STMTreap, range 1000000, 0% read:     40196 operations/sec
+---------- timed run
+ 1 threads,  CoarseLockTreap, range 1000000, 0% read:    678450 operations/sec
+ 2 threads,  CoarseLockTreap, range 1000000, 0% read:    262161 operations/sec
+ 4 threads,  CoarseLockTreap, range 1000000, 0% read:    257198 operations/sec
+ 8 threads,  CoarseLockTreap, range 1000000, 0% read:    253677 operations/sec
+16 threads,  CoarseLockTreap, range 1000000, 0% read:    262086 operations/sec
+ 1 threads,         STMTreap, range 1000000, 0% read:     94646 operations/sec
+ 2 threads,         STMTreap, range 1000000, 0% read:     85345 operations/sec
+ 4 threads,         STMTreap, range 1000000, 0% read:     80703 operations/sec
+ 8 threads,         STMTreap, range 1000000, 0% read:     74174 operations/sec
+16 threads,         STMTreap, range 1000000, 0% read:     34846 operations/sec
