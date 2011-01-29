@@ -1,0 +1,4 @@
+javac -J-Xmx512m -cp deuceAgent-1.2.0.jar `find . -name '*.java'`
+jsub -l nodes=1:h20:ppn=8 -- /kunle/users/nbronson/x86_64/jdk1.6/bin/java -javaagent:deuceAgent-1.2.0.jar  -Dorg.deuce.transaction.contextClass=org.deuce.transaction.tl2.Context  -cp . Main --key-range=1000 --read-pct=99
+jsub -l nodes=1:h20:ppn=8 -- /kunle/users/nbronson/x86_64/jdk1.6/bin/java -javaagent:deuceAgent-1.2.0.jar  -Dorg.deuce.transaction.contextClass=org.deuce.transaction.tl2.Context  -cp . Main --key-range=10000 --read-pct=95
+jsub -l nodes=1:h20:ppn=8 -- /kunle/users/nbronson/x86_64/jdk1.6/bin/java -javaagent:deuceAgent-1.2.0.jar  -Dorg.deuce.transaction.contextClass=org.deuce.transaction.tl2.Context  -cp . Main --key-range=1000000 --read-pct=0
