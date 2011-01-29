@@ -1,4 +1,5 @@
 //package cs149.stm;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class STMTreap implements IntSet {
     static class Node {
@@ -18,12 +19,12 @@ public class STMTreap implements IntSet {
         }
     }
 
-    private long randState = 0;
+    //private long randState = 0;
+    private AtomicLong randState = new AtomicLong();
     private Node root;
 
     @org.deuce.Atomic
-    public boolean  contains (final int key)
-    {
+    public boolean contains(final int key) {
         return containsRecursive (root,key);
     }
 
@@ -92,8 +93,12 @@ public class STMTreap implements IntSet {
     private int randPriority() {
         // The constants in this 64-bit linear congruential random number
         // generator are from http://nuclear.llnl.gov/CNP/rng/rngman/node4.html
-        randState = randState * 2862933555777941757L + 3037000493L;
-        return (int)(randState >> 30);
+	long c, temp;
+	temp = randState.get();	
+	c = (temp *  2862933555777941757L)+ 3037000493L;
+	while(!randState.compareAndSet(temp, c)); 
+//        randState = randState * 2862933555777941757L + 3037000493L;
+        return (int)(c >> 30);
     }
 
     private Node rotateRight(final Node node) {
@@ -114,7 +119,6 @@ public class STMTreap implements IntSet {
         nR.left = node;
         return nR;
     }
-
     @org.deuce.Atomic
     public void remove(final int key) {
         Node temp = removeImpl(root, key);
