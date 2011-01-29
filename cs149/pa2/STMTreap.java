@@ -19,7 +19,7 @@ public class STMTreap implements IntSet {
         }
     }
 
-    //private long randState = 0;
+ //   private long randState = 0;
     private AtomicLong randState = new AtomicLong();
     private Node root;
 
@@ -95,10 +95,11 @@ public class STMTreap implements IntSet {
         // generator are from http://nuclear.llnl.gov/CNP/rng/rngman/node4.html
 	long c, temp;
 	temp = randState.get();	
-	c = (temp *  2862933555777941757L)+ 3037000493L;
-	while(!randState.compareAndSet(temp, c)); 
-//        randState = randState * 2862933555777941757L + 3037000493L;
-        return (int)(c >> 30);
+        c = (temp *  2862933555777941757L)+ 3037000493L;
+	randState.compareAndSet(temp, c);
+        return (int)(randState.get() >> 30);
+    //    randState = randState * 2862933555777941757L + 3037000493L;
+    //	return (int) (randState >> 30);
     }
 
     private Node rotateRight(final Node node) {
