@@ -19,6 +19,65 @@ public class STMTreap implements IntSet {
         }
     }
 
+    private void wrong(int i)
+    {
+     if(i==1)
+      System.out.println("Priority mismatch; For details use PrintGraph()");
+     else
+      System.out.println("Key mismatch; For details use PrintGraph()");
+    }
+    private void workerCheck(final Node node)
+    {
+    	if (node == null)
+           return;
+        else
+        {
+	 if(node.right != null)
+         {
+           if(node.priority < node.right.priority)
+	   {
+		wrong(1);
+           }
+	   else if(node.key >= node.right.key)
+           {
+                wrong(2); 
+	   }
+	 }
+	 if(node.left != null)
+         {
+           if(node.priority < node.left.priority)
+           {
+                wrong(1);
+	   }
+	   else if(node.key <= node.left.key)
+	   {
+		wrong(2);
+	   }
+         }
+         workerCheck(node.left);
+	 workerCheck(node.right); 
+       }
+    }	 
+    
+    
+    public void checkUrself()
+    {
+     workerCheck(root);
+    } 
+     
+    public void PrintGraph()
+    {
+	printoutNode(root);
+    } 
+    private void printoutNode(final Node node)
+    {
+      if(node != null)
+      {
+        System.out.println(node);
+        printoutNode(node.left);
+        printoutNode(node.right);
+      }
+    }
  //   private long randState = 0;
     private AtomicLong randState = new AtomicLong();
     private Node root;
