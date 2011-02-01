@@ -86,7 +86,8 @@ public class STMTreap implements IntSet {
     public boolean contains(final int key) {
         return containsRecursive (root,key);
     }
-
+    
+    @org.deuce.Atomic
     public boolean  containsRecursive (final Node node, final int key)
     {
         if (node == null){
@@ -211,6 +212,7 @@ public class STMTreap implements IntSet {
                     // node.left needs to end up on top
                     final Node top = rotateRight(node);
                     top.right = removeImpl(top.right, key);
+
                     return top;
                 } else {
                     final Node top = rotateLeft(node);
