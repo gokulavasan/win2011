@@ -14,7 +14,7 @@ public class Ngram extends Configured implements Tool {
 
         
    public static class Map
-       extends Mapper<LongWritable, Text, Text, IntWritable> {
+       extends Mapper<Text, Text, Text, IntWritable> {
 
      static enum Counters { INPUT_WORDS }
 
@@ -65,7 +65,7 @@ public class Ngram extends Configured implements Tool {
        }
      }
 
-     public void map(LongWritable key, Text value, Context context)
+     public void map(Text key, Text value, Context context)
          throws IOException, InterruptedException {
        String line = value.toString();
        StringReader stringReader = new StringReader(line);
@@ -179,11 +179,6 @@ public class Ngram extends Configured implements Tool {
      }
    }
 
-public static class NonSplittableTextInputFormat
-    extends TextInputFormat {
-  protected boolean isSplitable(JobContext context, org.apache.hadoop.fs.Path filename) { return false; }
-}
-
    public int run(String[] args) throws Exception {
      //Args format: <#Ngram> <query_file> <input_dir> <output_dir>
      Job job = new Job(getConf());
@@ -198,7 +193,7 @@ public static class NonSplittableTextInputFormat
      job.setReducerClass(Reduce.class);
 
      // Note that these are the default.
-     job.setInputFormatClass(NonSplittableTextInputFormat.class);
+     job.setInputFormatClass(WholeFileTextInputFormat.class);
      job.setOutputFormatClass(TextOutputFormat.class);
 
      int ngram_num = Integer.parseInt(args[0]);
