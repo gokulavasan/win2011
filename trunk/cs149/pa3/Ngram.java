@@ -14,13 +14,13 @@ public class Ngram extends Configured implements Tool {
 
         
    public static class Map
-       extends Mapper<Text, Text, Text, IntWritable> {
+       extends Mapper<Text, Text, IntWritable, ScoreTitleRecord> {
 
      static enum Counters { INPUT_WORDS }
 
      private IntWritable one = new IntWritable(1);
      private Text word = new Text();
-
+     private int searchnum_max=1;
      private int ngram_num = 0;
      private Set<String> queryNgram = new HashSet<String>();
      private HashMap<String, String> textDocs = new HashMap<String, String>();
@@ -52,12 +52,13 @@ public class Ngram extends Configured implements Tool {
          String pattern = null;
 	 String entiretext = "";
          while ((pattern = fis.readLine()) != null) {
-           entiretext+=pattern;
+           entiretext+=pattern+" ";
          }
          NgramTokenizer queryTokens = new NgramTokenizer(entiretext, ngram_num);
 	 while(queryTokens.hasNext())
 	 {
-		queryNgram.add(queryTokens.next());	
+                String temp = queryTokens.next();
+		queryNgram.add(temp);	
 	 }	
        } catch (IOException ioe) {
          System.err.println("Caught exception while parsing the cached file '"
@@ -73,32 +74,7 @@ public class Ngram extends Configured implements Tool {
        String temp = null;
        String doc = "";
        String currentKey = null; 
-        
-       Iterator it = queryNgram.iterator();
-       int flag = 0;
-	while(it.hasNext())
-	{
-		word.set((String)it.next());
-		context.write(word, one);
-                flag = 1;
-	}
-        if(flag==1)
-	return;
-       	
-       /*if ((temp = bufReader.readLine())!=null)
-       {
-		word.set(temp);
-		context.write(word,one);
-		return;
-       }
-       else
-       {
-		word.set("not working");
-		context.write(word,one);
-		return;
-        }	
-       */
-
+       
        while((temp = bufReader.readLine())!=null)
        {
 	  int start = temp.indexOf("<title>");
@@ -148,8 +124,10 @@ public class Ngram extends Configured implements Tool {
 		}   
          }
 	 word.set(titlename);
-         one.set(ngramcount);
-	 context.write(word, one); 
+         one.set(0);
+         
+         ScoreTitleRecord tmp = new ScoreTitleRecord (new IntWritable(ngramcount), word);
+	 context.write(one,tmp); 
         } 	
 	//Tokenizer chunkTokens = new Tokenizer(line);
        /*StringTokenizer tokenizer = new StringTokenizer(line);
@@ -166,16 +144,61 @@ public class Ngram extends Configured implements Tool {
      }
    }
 
-   public static class Reduce
-       extends Reducer<Text, IntWritable, Text, IntWritable> {
-     public void reduce(Text key, Iterable<IntWritable> values,
+   public static class Combine
+       extends Reducer<IntWritable,ScoreTitleRecord, IntWritable, ScoreTitleRecord> {
+     public void reduce(IntWritable key, Iterable<ScoreTitleRecord> values,
          Context context) throws IOException, InterruptedException {
-
-       int sum = 0;
-       for (IntWritable val : values) {
-         sum += val.get();
+       Vector<ScoreTitleRecord> max_records = new Vector<ScoreTitleRecord>();
+       for (ScoreTitleRecord valtmp : values) {
+          ScoreTitleRecord val = new ScoreTitleRecord( new IntWritable(valtmp.score.get()), new Text(valtmp.title));
+          if (max_records.size() < 20){
+             max_records.add(val);
+          }else {
+             for (int i = 0; i < max_records.size(); i++){
+               int newscore = val.score.get();
+               int oldscore = max_records.elementAt(i).score.get();
+               if (newscore > oldscore ||
+                    newscore == oldscore && val.title.toString().compareTo(max_records.elementAt(i).title.toString())>0){
+                 max_records.elementAt(i).score = val.score;
+                 max_records.elementAt(i).title = val.title;
+                 break;
+               }
+             }
+          }
        }
-       context.write(key, new IntWritable(sum));
+       for (int i = 0; i < max_records.size(); i++){
+         context.write(key,max_records.elementAt(i));
+       }
+     }
+   }
+
+
+   public static class Reduce
+       extends Reducer<IntWritable,ScoreTitleRecord, IntWritable, Text> {
+     public void reduce(IntWritable key, Iterable<ScoreTitleRecord> values,
+         Context context) throws IOException, InterruptedException {
+       Vector<ScoreTitleRecord> max_records = new Vector<ScoreTitleRecord>();
+       for (ScoreTitleRecord valtmp : values) {
+          ScoreTitleRecord val = new ScoreTitleRecord( new IntWritable(valtmp.score.get()), new Text(valtmp.title));
+          if (max_records.size() < 20){
+             max_records.add(val);
+          }else {
+             for (int i = 0; i < max_records.size(); i++){
+               int newscore = val.score.get();
+               int oldscore = max_records.elementAt(i).score.get();
+               if (newscore > oldscore ||
+                    newscore == oldscore && val.title.toString().compareTo(max_records.elementAt(i).title.toString())>0){
+                 max_records.elementAt(i).score = val.score;
+                 max_records.elementAt(i).title = val.title;
+                 break;
+               }
+             }
+          }
+       }
+
+       for (int i = 0; i < max_records.size(); i++){
+         context.write(max_records.elementAt(i).score,max_records.elementAt(i).title);
+       }
      }
    }
 
@@ -185,11 +208,11 @@ public class Ngram extends Configured implements Tool {
      job.setJarByClass(Ngram.class);
      job.setJobName("Ngram");
 
-     job.setOutputKeyClass(Text.class);
-     job.setOutputValueClass(IntWritable.class);
+     job.setOutputKeyClass(IntWritable.class);
+     job.setOutputValueClass(ScoreTitleRecord.class);
 
      job.setMapperClass(Map.class);
-     job.setCombinerClass(Reduce.class);
+     job.setCombinerClass(Combine.class);
      job.setReducerClass(Reduce.class);
 
      // Note that these are the default.
