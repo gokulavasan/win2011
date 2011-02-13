@@ -88,6 +88,11 @@ public class Ngram extends Configured implements Tool {
      }
    }
 
+public static class NonSplittableTextInputFormat
+    extends TextInputFormat {
+  protected boolean isSplitable(org.apache.hadoop.fs.FileSystem fs, org.apache.hadoop.fs.Path filename) { return false; }
+}
+
    public int run(String[] args) throws Exception {
      //Args format: <#Ngram> <query_file> <input_dir> <output_dir>
      Job job = new Job(getConf());
@@ -102,7 +107,7 @@ public class Ngram extends Configured implements Tool {
      job.setReducerClass(Reduce.class);
 
      // Note that these are the default.
-     job.setInputFormatClass(TextInputFormat.class);
+     job.setInputFormatClass(NonSplittableTextInputFormat.class);
      job.setOutputFormatClass(TextOutputFormat.class);
 
      int ngram_num = Integer.parseInt(args[0]);
