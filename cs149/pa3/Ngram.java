@@ -12,6 +12,7 @@ import org.apache.hadoop.util.*;
 
 public class Ngram extends Configured implements Tool {
 
+        
    public static class Map
        extends Mapper<LongWritable, Text, Text, IntWritable> {
 
@@ -25,8 +26,8 @@ public class Ngram extends Configured implements Tool {
      private HashMap<String, String> textDocs = new HashMap<String, String>();
      private long numRecords = 0;
      private String inputFile;
-
-     public void setup(Context context) {
+     public void setup(Context context) 
+     {
        Configuration conf = context.getConfiguration();
        ngram_num = conf.getInt("ngram.num", 0);
        inputFile = conf.get("mapreduce.map.input.file");
@@ -38,10 +39,11 @@ public class Ngram extends Configured implements Tool {
          System.err.println("Caught exception while getting cached files: "
              + StringUtils.stringifyException(ioe));
        }
-       for (Path queryFile : queryFiles) {
+       for (Path queryFile : queryFiles) 
+       {
          parseQueryFile(queryFile);
        }
-     }
+      } 
 
      private void parseQueryFile(Path queryFile) {
        try {
@@ -52,7 +54,7 @@ public class Ngram extends Configured implements Tool {
          while ((pattern = fis.readLine()) != null) {
            entiretext+=pattern;
          }
-         Tokenizer queryTokens = new Tokenizer(entiretext);
+         NgramTokenizer queryTokens = new NgramTokenizer(entiretext, ngram_num);
 	 while(queryTokens.hasNext())
 	 {
 		queryNgram.add(queryTokens.next());	
@@ -69,9 +71,34 @@ public class Ngram extends Configured implements Tool {
        StringReader stringReader = new StringReader(line);
        BufferedReader bufReader = new BufferedReader(stringReader);
        String temp = null;
-       String doc = null;
-       String currentKey = null;  
-       int firstIter = 1;
+       String doc = "";
+       String currentKey = null; 
+        
+       Iterator it = queryNgram.iterator();
+       int flag = 0;
+	while(it.hasNext())
+	{
+		word.set((String)it.next());
+		context.write(word, one);
+                flag = 1;
+	}
+        if(flag==1)
+	return;
+       	
+       /*if ((temp = bufReader.readLine())!=null)
+       {
+		word.set(temp);
+		context.write(word,one);
+		return;
+       }
+       else
+       {
+		word.set("not working");
+		context.write(word,one);
+		return;
+        }	
+       */
+
        while((temp = bufReader.readLine())!=null)
        {
 	  int start = temp.indexOf("<title>");
@@ -85,7 +112,7 @@ public class Ngram extends Configured implements Tool {
 		break;
           }
        }
-           	   
+
        do
        { 
          int start = temp.indexOf("<title>");
@@ -103,7 +130,7 @@ public class Ngram extends Configured implements Tool {
            currentKey = temp.substring(start+7,end); 	
 	   doc = "";
          }
-       } while((temp = bufReader.readLine())!=null); 
+        } while((temp = bufReader.readLine())!=null); 
 
 	Set keys = textDocs.keySet();
         Iterator keysIter = keys.iterator();
@@ -112,7 +139,7 @@ public class Ngram extends Configured implements Tool {
 	 String titlename = (String)keysIter.next();
          String docval = (String)textDocs.get(titlename);
 	 int ngramcount = 0;
-	 Tokenizer doctoken = new Tokenizer(docval);
+	 NgramTokenizer doctoken = new NgramTokenizer(docval, ngram_num);
 	 while(doctoken.hasNext())
 	 {
          	if(queryNgram.contains(doctoken.next()))
@@ -154,7 +181,7 @@ public class Ngram extends Configured implements Tool {
 
 public static class NonSplittableTextInputFormat
     extends TextInputFormat {
-  protected boolean isSplitable(org.apache.hadoop.fs.FileSystem fs, org.apache.hadoop.fs.Path filename) { return false; }
+  protected boolean isSplitable(JobContext context, org.apache.hadoop.fs.Path filename) { return false; }
 }
 
    public int run(String[] args) throws Exception {
