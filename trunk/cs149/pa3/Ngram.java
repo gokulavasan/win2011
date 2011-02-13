@@ -17,12 +17,12 @@ public class Ngram extends Configured implements Tool {
 
      static enum Counters { INPUT_WORDS }
 
-     private final static IntWritable one = new IntWritable(1);
+     private IntWritable one = new IntWritable(1);
      private Text word = new Text();
 
      private int ngram_num = 0;
      private Set<String> queryNgram = new HashSet<String>();
-
+     private HashMap<String, String> textDocs = new HashMap<String, String>();
      private long numRecords = 0;
      private String inputFile;
 
@@ -48,9 +48,15 @@ public class Ngram extends Configured implements Tool {
          BufferedReader fis = new BufferedReader(new FileReader(
              queryFile.toString()));
          String pattern = null;
+	 String entiretext = "";
          while ((pattern = fis.readLine()) != null) {
-           queryNgram.add(pattern);
+           entiretext+=pattern;
          }
+         Tokenizer queryTokens = new Tokenizer(entiretext);
+	 while(queryTokens.hasNext())
+	 {
+		queryNgram.add(queryTokens.next());	
+	 }	
        } catch (IOException ioe) {
          System.err.println("Caught exception while parsing the cached file '"
              + queryFile + "' : " + StringUtils.stringifyException(ioe));
@@ -60,8 +66,66 @@ public class Ngram extends Configured implements Tool {
      public void map(LongWritable key, Text value, Context context)
          throws IOException, InterruptedException {
        String line = value.toString();
+       StringReader stringReader = new StringReader(line);
+       BufferedReader bufReader = new BufferedReader(stringReader);
+       String temp = null;
+       String doc = null;
+       String currentKey = null;  
+       int firstIter = 1;
+       while((temp = bufReader.readLine())!=null)
+       {
+	  int start = temp.indexOf("<title>");
+	  int end = temp.indexOf("</title>");
+          if(start== -1 && end == -1)
+	  {
+		continue;
+          }
+	  else
+	  {
+		break;
+          }
+       }
+           	   
+       do
+       { 
+         int start = temp.indexOf("<title>");
+	 int end = temp.indexOf("</title>");
+         if (start == -1 && end == -1)
+	 {	
+		doc += temp;
+	 }
+         else
+         {
+	   if(currentKey != null)
+	   {
+		textDocs.put(currentKey, doc);
+	   } 
+           currentKey = temp.substring(start+7,end); 	
+	   doc = "";
+         }
+       } while((temp = bufReader.readLine())!=null); 
 
-       StringTokenizer tokenizer = new StringTokenizer(line);
+	Set keys = textDocs.keySet();
+        Iterator keysIter = keys.iterator();
+        while(keysIter.hasNext())
+        {
+	 String titlename = (String)keysIter.next();
+         String docval = (String)textDocs.get(titlename);
+	 int ngramcount = 0;
+	 Tokenizer doctoken = new Tokenizer(docval);
+	 while(doctoken.hasNext())
+	 {
+         	if(queryNgram.contains(doctoken.next()))
+		{
+			ngramcount++;
+		}   
+         }
+	 word.set(titlename);
+         one.set(ngramcount);
+	 context.write(word, one); 
+        } 	
+	//Tokenizer chunkTokens = new Tokenizer(line);
+       /*StringTokenizer tokenizer = new StringTokenizer(line);
        while (tokenizer.hasMoreTokens()) {
          word.set(tokenizer.nextToken());
          context.write(word, one);
@@ -71,7 +135,7 @@ public class Ngram extends Configured implements Tool {
        if ((++numRecords % 100) == 0) {
          context.setStatus("Finished processing " + numRecords
              + " records " + "from the input file: " + inputFile);
-       }
+       }*/
      }
    }
 
