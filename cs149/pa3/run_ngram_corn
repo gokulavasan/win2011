@@ -1,0 +1,2 @@
+rm -rf output
+hadoop jar ngram.jar Ngram  4 file://$PWD/query1.txt file://$PWD/input file://$PWD/output
