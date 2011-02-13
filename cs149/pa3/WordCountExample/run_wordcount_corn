@@ -1,0 +1,2 @@
+rm -rf output
+hadoop jar WordCount.jar org.myorg.WordCount file://$PWD/input file://$PWD/output

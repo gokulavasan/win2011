@@ -1,0 +1,3 @@
+javac -cp ${HADOOP_HOME}/hadoop-common-0.21.0.jar:${HADOOP_HOME}/hadoop-hdfs-0.21.0.jar:${HADOOP_HOME}/hadoop-mapred-0.21.0.jar -d class_dir WordCount.java
+
+jar -cvf WordCount.jar -C class_dir/ .
