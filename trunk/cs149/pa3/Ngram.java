@@ -20,53 +20,46 @@ public class Ngram extends Configured implements Tool {
      private final static IntWritable one = new IntWritable(1);
      private Text word = new Text();
 
-     private boolean caseSensitive = true;
-     private Set<String> patternsToSkip = new HashSet<String>();
+     private int ngram_num = 0;
+     private Set<String> queryNgram = new HashSet<String>();
 
      private long numRecords = 0;
      private String inputFile;
 
      public void setup(Context context) {
        Configuration conf = context.getConfiguration();
-       caseSensitive = conf.getBoolean("wordcount.case.sensitive", true);
+       ngram_num = conf.getInt("ngram.num", 0);
        inputFile = conf.get("mapreduce.map.input.file");
 
-       if (conf.getBoolean("wordcount.skip.patterns", false)) {
-         Path[] patternsFiles = new Path[0];
-         try {
-           patternsFiles = DistributedCache.getLocalCacheFiles(conf);
-         } catch (IOException ioe) {
-           System.err.println("Caught exception while getting cached files: "
-               + StringUtils.stringifyException(ioe));
-         }
-         for (Path patternsFile : patternsFiles) {
-           parseSkipFile(patternsFile);
-         }
+       Path[] queryFiles = new Path[0];
+       try {
+         queryFiles = DistributedCache.getLocalCacheFiles(conf);
+       } catch (IOException ioe) {
+         System.err.println("Caught exception while getting cached files: "
+             + StringUtils.stringifyException(ioe));
+       }
+       for (Path queryFile : queryFiles) {
+         parseQueryFile(queryFile);
        }
      }
 
-     private void parseSkipFile(Path patternsFile) {
+     private void parseQueryFile(Path queryFile) {
        try {
          BufferedReader fis = new BufferedReader(new FileReader(
-             patternsFile.toString()));
+             queryFile.toString()));
          String pattern = null;
          while ((pattern = fis.readLine()) != null) {
-           patternsToSkip.add(pattern);
+           queryNgram.add(pattern);
          }
        } catch (IOException ioe) {
          System.err.println("Caught exception while parsing the cached file '"
-             + patternsFile + "' : " + StringUtils.stringifyException(ioe));
+             + queryFile + "' : " + StringUtils.stringifyException(ioe));
        }
      }
 
      public void map(LongWritable key, Text value, Context context)
          throws IOException, InterruptedException {
-       String line = (caseSensitive) ?
-           value.toString() : value.toString().toLowerCase();
-
-       for (String pattern : patternsToSkip) {
-         line = line.replaceAll(pattern, "");
-       }
+       String line = value.toString();
 
        StringTokenizer tokenizer = new StringTokenizer(line);
        while (tokenizer.hasMoreTokens()) {
@@ -113,13 +106,13 @@ public class Ngram extends Configured implements Tool {
      job.setOutputFormatClass(TextOutputFormat.class);
 
      int ngram_num = Integer.parseInt(args[0]);
+     job.getConfiguration().setInt("ngram.num", ngram_num);
      
      DistributedCache.addCacheFile(new Path(args[1]).toUri(),
              job.getConfiguration());
-     //job.getConfiguration().setBoolean("wordcount.skip.patterns", true);
 
-     FileInputFormat.setInputPaths(job, new Path(args.get(2)));
-     FileOutputFormat.setOutputPath(job, new Path(args.get(3)));
+     FileInputFormat.setInputPaths(job, new Path(args[2]));
+     FileOutputFormat.setOutputPath(job, new Path(args[3]));
 
      boolean success = job.waitForCompletion(true);
      return success ? 0 : 1;
