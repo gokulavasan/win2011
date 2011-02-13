@@ -43,7 +43,7 @@ public class Ngram extends Configured implements Tool {
    public int run(String [] args) throws Exception {
      Job job = new Job(getConf());
      job.setJarByClass(Ngram.class);
-     job.setJobName("wordcount");
+     job.setJobName("Ngram");
 
      job.setOutputKeyClass(Text.class);
      job.setOutputValueClass(IntWritable.class);
