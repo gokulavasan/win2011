@@ -1,0 +1,1 @@
+./wiki_hadoop jar ngram.jar Ngram 4 file://$PWD/query2.txt /tmp/enwiki/all
