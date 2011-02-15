@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# THIS SCRIPT WILL ONLY RUN ON THE CYCLADES-MASTER MACHINE
+
+# This script will run hadoop jobs over varying subsets of wikipedia
+# and then copy the results back to the local directory
+
+# This is the directory from which the script is being run
+# and to which the result directory will be copied back
+RETURN_DIR=$PWD/output
+
+# This is the output directory for the hadoop job in HDFS
+TARGET=/user/`whoami`/output
+
+HADOOP=/filer2/vol3/class/cs149-hadoop/hadoop-0.21.0
+
+# Check to see if a local output directory exists
+# If not make one
+if [ ! -d "$RETURN_DIR" ]
+then
+	echo "Creating local output directory $RETURN_DIR"
+	mkdir $RETURN_DIR
+else
+	echo "Local output directory $RETURN_DIR already exists"
+	echo "Cleaning out the target directory"
+	rm -f $RETURN_DIR/*
+fi
+
+$HADOOP/bin/hadoop fs -rmr /user/`whoami`/output
+
+echo "Running hadoop..."
+
+$HADOOP/bin/hadoop $@ $TARGET 
+
+echo "Copying result files from $TARGET to $RETURN_DIR"
+
+$HADOOP/bin/hadoop fs -get $TARGET/* $RETURN_DIR
+
+echo "Removing output directory $TARGET from HDFS"
+
+$HADOOP/bin/hadoop fs -rmr $TARGET
+

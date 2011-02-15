@@ -1,0 +1,2 @@
+export HADOOP_HOME=/usr/class/cs149/hadoop-0.21.0
+export PATH=$PATH:${HADOOP_HOME}/bin
