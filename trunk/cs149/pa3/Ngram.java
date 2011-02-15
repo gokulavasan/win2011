@@ -55,11 +55,14 @@ public class Ngram extends Configured implements Tool {
            entiretext+=pattern+" ";
          }
          NgramTokenizer queryTokens = new NgramTokenizer(entiretext, ngram_num);
+         System.out.println("Start Query TOKENS!!!\n");
 	 while(queryTokens.hasNext())
 	 {
                 String temp = queryTokens.next();
+                 System.out.println(temp);
 		queryNgram.add(temp);	
 	 }	
+         System.out.println("END Query TOKENS!!!\n");
        } catch (IOException ioe) {
          System.err.println("Caught exception while parsing the cached file '"
              + queryFile + "' : " + StringUtils.stringifyException(ioe));
@@ -72,50 +75,59 @@ public class Ngram extends Configured implements Tool {
        String temp = null;
        String doc = "";
        String currentKey = null; 
+       ScoreTitleRecord tmp;
+       one.set(0);
+       String titlename = key.toString();
+       String docval = value.toString();
+       int ngramcount = 0;
+       NgramTokenizer doctoken = new NgramTokenizer(docval, ngram_num);
+       while(doctoken.hasNext())
+       {
+       	if(queryNgram.contains(doctoken.next()))
+              {
+              	ngramcount++;
+              }   
+       }
+       word.set(titlename);
        
-	 String titlename = key.toString();
-         String docval = value.toString();
-	 int ngramcount = 0;
-	 NgramTokenizer doctoken = new NgramTokenizer(docval, ngram_num);
-	 while(doctoken.hasNext())
-	 {
-         	if(queryNgram.contains(doctoken.next()))
-		{
-			ngramcount++;
-		}   
-         }
-	 word.set(titlename);
-         one.set(0);
-         
-         ScoreTitleRecord tmp = new ScoreTitleRecord (new IntWritable(ngramcount), word);
-	 context.write(one,tmp); 
+       tmp = new ScoreTitleRecord (new IntWritable(ngramcount), word);
+       context.write(one,tmp); 
+       tmp = null;
      }
+   }
+
+   public static void printComparison(ScoreTitleRecord a, ScoreTitleRecord b){
+      System.out.println("Comparing "+a.title+"("+a.score+") to "+b.title+"("+b.score+")");
    }
 
    public static class Combine
        extends Reducer<IntWritable,ScoreTitleRecord, IntWritable, ScoreTitleRecord> {
      public void reduce(IntWritable key, Iterable<ScoreTitleRecord> values,
          Context context) throws IOException, InterruptedException {
-       Vector<ScoreTitleRecord> max_records = new Vector<ScoreTitleRecord>();
+       List<ScoreTitleRecord> max_records = new ArrayList<ScoreTitleRecord>(20);
+       ScoreTitleRecord MinRecord;
        for (ScoreTitleRecord valtmp : values) {
           ScoreTitleRecord val = new ScoreTitleRecord( new IntWritable(valtmp.score.get()), new Text(valtmp.title));
           if (max_records.size() < 20){
              max_records.add(val);
           }else {
-             for (int i = 0; i < max_records.size(); i++){
-               int newscore = val.score.get();
-               int oldscore = max_records.elementAt(i).score.get();
-               if (newscore > oldscore ||
-                    newscore == oldscore && val.title.toString().compareTo(max_records.elementAt(i).title.toString())>0){
-                 max_records.elementAt(i).score = val.score;
-                 max_records.elementAt(i).title = val.title;
-                 break;
-               }
+             MinRecord = max_records.get(0);
+             Iterator<ScoreTitleRecord> it = max_records.iterator();
+             while (it.hasNext()){
+                ScoreTitleRecord rec = it.next();
+                if (rec.compareTo(MinRecord) <0){
+                  MinRecord=rec;
+                }
+             }
+             if (MinRecord.compareTo(val) < 0){
+                max_records.remove(MinRecord);
+                max_records.add(val);
              }
           }
        }
-       for (int i = 0; i < max_records.size(); i++){
-         context.write(key,max_records.elementAt(i));
+       Iterator<ScoreTitleRecord> it = max_records.iterator();
+       while (it.hasNext()){
+         context.write(key,it.next());
        }
      }
    }
@@ -125,27 +137,32 @@ public class Ngram extends Configured implements Tool {
        extends Reducer<IntWritable,ScoreTitleRecord, IntWritable, Text> {
      public void reduce(IntWritable key, Iterable<ScoreTitleRecord> values,
          Context context) throws IOException, InterruptedException {
-       Vector<ScoreTitleRecord> max_records = new Vector<ScoreTitleRecord>();
+       List<ScoreTitleRecord> max_records = new ArrayList<ScoreTitleRecord>(20);
+       ScoreTitleRecord MinRecord;
        for (ScoreTitleRecord valtmp : values) {
           ScoreTitleRecord val = new ScoreTitleRecord( new IntWritable(valtmp.score.get()), new Text(valtmp.title));
           if (max_records.size() < 20){
              max_records.add(val);
           }else {
-             for (int i = 0; i < max_records.size(); i++){
-               int newscore = val.score.get();
-               int oldscore = max_records.elementAt(i).score.get();
-               if (newscore > oldscore ||
-                    newscore == oldscore && val.title.toString().compareTo(max_records.elementAt(i).title.toString())>0){
-                 max_records.elementAt(i).score = val.score;
-                 max_records.elementAt(i).title = val.title;
-                 break;
-               }
+             MinRecord = max_records.get(0);
+             Iterator<ScoreTitleRecord> it = max_records.iterator();
+             while (it.hasNext()){
+                ScoreTitleRecord rec = it.next();
+                if (rec.compareTo(MinRecord) <0){
+                  MinRecord=rec;
+                }
+             }
+             if (MinRecord.compareTo(val) < 0){
+                max_records.remove(MinRecord);
+                max_records.add(val);
              }
           }
        }
-
-       for (int i = 0; i < max_records.size(); i++){
-         context.write(max_records.elementAt(i).score,max_records.elementAt(i).title);
+       Collections.sort(max_records, Collections.reverseOrder());
+       Iterator<ScoreTitleRecord> it = max_records.iterator();
+       while (it.hasNext()){
+         ScoreTitleRecord rec = it.next();
+         context.write(rec.score,rec.title);
        }
      }
    }
