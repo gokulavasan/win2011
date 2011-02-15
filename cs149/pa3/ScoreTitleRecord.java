@@ -10,7 +10,7 @@ import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
 
-public class ScoreTitleRecord implements java.io.Serializable, org.apache.hadoop.io.Writable {
+public class ScoreTitleRecord implements java.io.Serializable, org.apache.hadoop.io.Writable, Comparable<ScoreTitleRecord> {
   IntWritable score;
   Text title;
 
@@ -41,5 +41,11 @@ public class ScoreTitleRecord implements java.io.Serializable, org.apache.hadoop
 
     public String toString() {
        return title.toString() + " " + score.get();
+    } 
+
+   public int compareTo(ScoreTitleRecord o) {
+        int cmp=0;
+        cmp = score.get() - o.score.get();
+        return cmp == 0 ? title.toString().compareTo(o.title.toString()) : cmp;
     }
 }
