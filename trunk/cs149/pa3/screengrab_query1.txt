@@ -1,0 +1,142 @@
+-bash-3.2$ ./run_ngram_cyclades
+Local output directory
+/athitos/export/10spr_cs315a/home/joshlang/win2011/cs149/pa3/output already
+exists
+Cleaning out the target directory
+11/02/14 23:43:27 INFO security.Groups: Group mapping
+impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping;
+cacheTimeout=300000
+11/02/14 23:43:27 WARN conf.Configuration: mapred.task.id is deprecated.
+Instead, use mapreduce.task.attempt.id
+rmr: cannot remove /user/joshlang/output: No such file or directory.
+Running hadoop...
+11/02/14 23:43:29 INFO security.Groups: Group mapping
+impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping;
+cacheTimeout=300000
+11/02/14 23:43:29 WARN conf.Configuration: mapred.task.id is deprecated.
+Instead, use mapreduce.task.attempt.id
+11/02/14 23:43:29 WARN mapreduce.JobSubmitter: Use GenericOptionsParser for
+parsing the arguments. Applications should implement Tool for the same.
+11/02/14 23:43:30 INFO input.FileInputFormat: Total input paths to process :
+408
+11/02/14 23:43:31 WARN conf.Configuration: mapred.map.tasks is deprecated.
+Instead, use mapreduce.job.maps
+11/02/14 23:43:31 INFO mapreduce.JobSubmitter: number of splits:408
+11/02/14 23:43:31 INFO mapreduce.JobSubmitter: adding the following namenodes'
+delegation tokens:null
+11/02/14 23:43:31 INFO mapreduce.Job: Running job: job_201102071112_0605
+11/02/14 23:43:32 INFO mapreduce.Job:  map 0% reduce 0%
+11/02/14 23:43:45 INFO mapreduce.Job:  map 2% reduce 0%
+11/02/14 23:43:46 INFO mapreduce.Job:  map 11% reduce 0%
+11/02/14 23:43:47 INFO mapreduce.Job:  map 15% reduce 0%
+11/02/14 23:43:48 INFO mapreduce.Job:  map 17% reduce 0%
+11/02/14 23:43:49 INFO mapreduce.Job:  map 18% reduce 0%
+11/02/14 23:43:50 INFO mapreduce.Job:  map 19% reduce 0%
+11/02/14 23:43:54 INFO mapreduce.Job:  map 21% reduce 0%
+11/02/14 23:43:55 INFO mapreduce.Job:  map 23% reduce 0%
+11/02/14 23:43:56 INFO mapreduce.Job:  map 26% reduce 0%
+11/02/14 23:43:57 INFO mapreduce.Job:  map 27% reduce 0%
+11/02/14 23:44:04 INFO mapreduce.Job:  map 28% reduce 8%
+11/02/14 23:44:07 INFO mapreduce.Job:  map 29% reduce 8%
+11/02/14 23:44:09 INFO mapreduce.Job:  map 31% reduce 8%
+11/02/14 23:44:10 INFO mapreduce.Job:  map 36% reduce 9%
+11/02/14 23:44:11 INFO mapreduce.Job:  map 41% reduce 9%
+11/02/14 23:44:13 INFO mapreduce.Job:  map 43% reduce 9%
+11/02/14 23:44:14 INFO mapreduce.Job:  map 45% reduce 9%
+11/02/14 23:44:18 INFO mapreduce.Job:  map 46% reduce 9%
+11/02/14 23:44:19 INFO mapreduce.Job:  map 47% reduce 9%
+11/02/14 23:44:20 INFO mapreduce.Job:  map 49% reduce 9%
+11/02/14 23:44:21 INFO mapreduce.Job:  map 51% reduce 9%
+11/02/14 23:44:22 INFO mapreduce.Job:  map 53% reduce 9%
+11/02/14 23:44:24 INFO mapreduce.Job:  map 55% reduce 9%
+11/02/14 23:44:26 INFO mapreduce.Job:  map 56% reduce 9%
+11/02/14 23:44:30 INFO mapreduce.Job:  map 57% reduce 17%
+11/02/14 23:44:31 INFO mapreduce.Job:  map 58% reduce 17%
+11/02/14 23:44:32 INFO mapreduce.Job:  map 60% reduce 17%
+11/02/14 23:44:33 INFO mapreduce.Job:  map 61% reduce 18%
+11/02/14 23:44:34 INFO mapreduce.Job:  map 63% reduce 18%
+11/02/14 23:44:35 INFO mapreduce.Job:  map 65% reduce 18%
+11/02/14 23:44:36 INFO mapreduce.Job:  map 68% reduce 19%
+11/02/14 23:44:37 INFO mapreduce.Job:  map 70% reduce 19%
+11/02/14 23:44:39 INFO mapreduce.Job:  map 72% reduce 19%
+11/02/14 23:44:40 INFO mapreduce.Job:  map 75% reduce 19%
+11/02/14 23:44:41 INFO mapreduce.Job:  map 76% reduce 19%
+11/02/14 23:44:42 INFO mapreduce.Job:  map 77% reduce 19%
+11/02/14 23:44:45 INFO mapreduce.Job:  map 79% reduce 19%
+11/02/14 23:44:46 INFO mapreduce.Job:  map 82% reduce 19%
+11/02/14 23:44:49 INFO mapreduce.Job:  map 83% reduce 19%
+11/02/14 23:44:50 INFO mapreduce.Job:  map 84% reduce 24%
+11/02/14 23:44:51 INFO mapreduce.Job:  map 85% reduce 24%
+11/02/14 23:44:52 INFO mapreduce.Job:  map 86% reduce 24%
+11/02/14 23:44:53 INFO mapreduce.Job:  map 86% reduce 25%
+11/02/14 23:44:54 INFO mapreduce.Job:  map 87% reduce 25%
+11/02/14 23:44:55 INFO mapreduce.Job:  map 88% reduce 25%
+11/02/14 23:44:56 INFO mapreduce.Job:  map 89% reduce 27%
+11/02/14 23:44:57 INFO mapreduce.Job:  map 90% reduce 27%
+11/02/14 23:44:58 INFO mapreduce.Job:  map 93% reduce 27%
+11/02/14 23:44:59 INFO mapreduce.Job:  map 94% reduce 28%
+11/02/14 23:45:01 INFO mapreduce.Job:  map 95% reduce 28%
+11/02/14 23:45:02 INFO mapreduce.Job:  map 96% reduce 29%
+11/02/14 23:45:04 INFO mapreduce.Job:  map 97% reduce 29%
+11/02/14 23:45:05 INFO mapreduce.Job:  map 98% reduce 29%
+11/02/14 23:45:07 INFO mapreduce.Job:  map 99% reduce 29%
+11/02/14 23:45:08 INFO mapreduce.Job:  map 99% reduce 30%
+11/02/14 23:45:11 INFO mapreduce.Job:  map 99% reduce 33%
+11/02/14 23:45:32 INFO mapreduce.Job:  map 100% reduce 33%
+11/02/14 23:45:40 INFO mapreduce.Job:  map 100% reduce 100%
+11/02/14 23:45:42 INFO mapreduce.Job: Job complete: job_201102071112_0605
+11/02/14 23:45:42 INFO mapreduce.Job: Counters: 33
+        FileSystemCounters
+                FILE_BYTES_READ=291337
+                FILE_BYTES_WRITTEN=598172
+                HDFS_BYTES_READ=27438713433
+                HDFS_BYTES_WRITTEN=705
+        Shuffle Errors
+                BAD_ID=0
+                CONNECTION=0
+                IO_ERROR=0
+                WRONG_LENGTH=0
+                WRONG_MAP=0
+                WRONG_REDUCE=0
+        Job Counters
+                Data-local map tasks=398
+                Total time spent by all maps waiting after reserving slots
+(ms)=0
+                Total time spent by all reduces waiting after reserving slots
+(ms)=0
+                Rack-local map tasks=11
+                SLOTS_MILLIS_MAPS=8680936
+                SLOTS_MILLIS_REDUCES=42896
+                Launched map tasks=409
+                Launched reduce tasks=2
+        Map-Reduce Framework
+                Combine input records=4901009
+                Combine output records=8160
+                Failed Shuffles=0
+                GC time elapsed (ms)=409115
+                Map input records=4901009
+                Map output bytes=156562509
+                Map output records=4901009
+                Merged Map outputs=408
+                Reduce input groups=1
+                Reduce input records=8160
+                Reduce output records=20
+                Reduce shuffle bytes=293779
+                Shuffled Maps =408
+                Spilled Records=16320
+                SPLIT_RAW_BYTES=53746
+Copying result files from /user/joshlang/output to
+/athitos/export/10spr_cs315a/home/joshlang/win2011/cs149/pa3/output
+11/02/14 23:45:43 INFO security.Groups: Group mapping
+impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping;
+cacheTimeout=300000
+11/02/14 23:45:43 WARN conf.Configuration: mapred.task.id is deprecated.
+Instead, use mapreduce.task.attempt.id
+Removing output directory /user/joshlang/output from HDFS
+11/02/14 23:45:45 INFO security.Groups: Group mapping
+impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping;
+cacheTimeout=300000
+11/02/14 23:45:45 WARN conf.Configuration: mapred.task.id is deprecated.
+Instead, use mapreduce.task.attempt.id
+Deleted hdfs://cyclades-0.tendot.stanford.edu:31149/user/joshlang/output
+

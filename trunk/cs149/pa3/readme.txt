@@ -1,0 +1,19 @@
+PA3 Hadoop Ngram Writeup
+
+= Introduction =
+
+The Hadoop Ngram implementation involves a customized InputFormat, NGram Tokenizer, and custom data object to transfer title/score values through the map-reduce flow.  Top 20 scored matches for two query documents at N-gram of 4 are included as results.
+
+= Details =
+
+To get around the per line default splitting/reader, a customized InputFormat was used.  Originally based on'WholeFileTextInputFormat.java' (reference in the header of the file), 'WholePageTextInputFormat.java' parses each chunk and returns key=title and value = page contents.  Allowing the whole chunk to be processed at once causes heap errors.
+
+Taking in a String, the Ngram tokenizer encapsulates generating the list of Ngrams in an iterator like fashion (did not actually implement interfaces).
+
+Map class on setup parses the input query file for ngram keys and stores for later map function use.  Map function then takes the value and applies the Ngram tokenizer with every hit to the query file ngrams incrementing the 'score'.
+
+The Map class outputs a combined score/title class ScoreTitleRecord as the value and a constant 0 for the key.  This guarantees that only one reduce function will in the end be called.
+
+The Combiner class filters the results to the top 20 scoring results from each Map call to reduce the load on the final reduce stage.
+
+The Reduce stage combines the top 20 results from each combiner run and takes the top 20, then sorts those 20 results.  It then outputs in score, title format.
