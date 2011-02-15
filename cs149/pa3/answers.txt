@@ -1,0 +1,44 @@
+--Query 1
+37	Negative Syndicate
+17	Wikipedia:WikiProject The Simpsons/Example generated lists/S08
+10	Box Television
+8	Sports data
+7	Nidaros Cathedral West Front
+6	Wikipedia:Reference desk archive/Science/April 2006
+6	Wikipedia:Articles for creation/2006-06-23
+6	Puerto Rican Spindalis
+5	Wikipedia:Two-tier system
+5	Wikipedia:Reliable sources/Noticeboard/Archive 50
+5	Wikipedia:Categories for discussion/User/Archive/December 2007
+5	Wikipedia:Categories for deletion/Log/2006 June 19/Wikipedians by politics
+5	Raw image format
+5	List of camouflage patterns
+5	Keyboard layout
+5	Info-gap decision theory
+5	Identity document
+5	Gangstar 2: Kings of L.A
+5	Flags of Europe
+5	Decomposition method (constraint satisfaction)
+
+--Query 2
+125     Wikipedia:Academic studies of Wikipedia
+9       Wikipedia:WikiProject Cheshire/2009 member questionnaire answers
+5       Wikipedia:Requests for arbitration/Paranormal/Workshop
+5       Wikipedia:Categories for discussion/Log/2007 April 13
+5       Wikipedia:Articles for creation/2007-09-04
+5       Keith Tyson
+5       Karner Blue
+5       BSI Group
+4       Wolfson Centre for Magnetics
+4       Wikipedia:Village pump (policy)/Archive 43
+4       Wikipedia:Television episodes/RFC Episode Notability
+4       Wikipedia:Requests for adminship/Soman
+4       Wikipedia:Reference desk archive/Science/April 2006
+4       Wikipedia:Possibly unfree files/2009 April 15
+4       Wikipedia:Articles for creation/2006-07-30
+4       Wikipedia:Administrators' noticeboard/IncidentArchive399
+4       Wikipedia:Administrators' noticeboard/Archive164
+4       VJing
+4       Technological and industrial history of the People's Republic of China
+4       Tamil Nadu
+
