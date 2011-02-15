@@ -55,14 +55,11 @@ public class Ngram extends Configured implements Tool {
            entiretext+=pattern+" ";
          }
          NgramTokenizer queryTokens = new NgramTokenizer(entiretext, ngram_num);
-         System.out.println("Start Query TOKENS!!!\n");
 	 while(queryTokens.hasNext())
 	 {
                 String temp = queryTokens.next();
-                 System.out.println(temp);
 		queryNgram.add(temp);	
 	 }	
-         System.out.println("END Query TOKENS!!!\n");
        } catch (IOException ioe) {
          System.err.println("Caught exception while parsing the cached file '"
              + queryFile + "' : " + StringUtils.stringifyException(ioe));
