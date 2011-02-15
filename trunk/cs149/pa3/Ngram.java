@@ -69,51 +69,12 @@ public class Ngram extends Configured implements Tool {
      public void map(Text key, Text value, Context context)
          throws IOException, InterruptedException {
        String line = value.toString();
-       StringReader stringReader = new StringReader(line);
-       BufferedReader bufReader = new BufferedReader(stringReader);
        String temp = null;
        String doc = "";
        String currentKey = null; 
        
-       while((temp = bufReader.readLine())!=null)
-       {
-	  int start = temp.indexOf("<title>");
-	  int end = temp.indexOf("</title>");
-          if(start== -1 && end == -1)
-	  {
-		continue;
-          }
-	  else
-	  {
-		break;
-          }
-       }
-
-       do
-       { 
-         int start = temp.indexOf("<title>");
-	 int end = temp.indexOf("</title>");
-         if (start == -1 && end == -1)
-	 {	
-		doc += temp;
-	 }
-         else
-         {
-	   if(currentKey != null)
-	   {
-		textDocs.put(currentKey, doc);
-	   } 
-           currentKey = temp.substring(start+7,end); 	
-	   doc = "";
-         }
-        } while((temp = bufReader.readLine())!=null); 
-
-	Set keys = textDocs.keySet();
-        Iterator keysIter = keys.iterator();
-        while(keysIter.hasNext())
-        {
-	 String titlename = (String)keysIter.next();
-         String docval = (String)textDocs.get(titlename);
+	 String titlename = key.toString();
+         String docval = value.toString();
 	 int ngramcount = 0;
 	 NgramTokenizer doctoken = new NgramTokenizer(docval, ngram_num);
 	 while(doctoken.hasNext())
@@ -128,19 +89,6 @@ public class Ngram extends Configured implements Tool {
          
          ScoreTitleRecord tmp = new ScoreTitleRecord (new IntWritable(ngramcount), word);
 	 context.write(one,tmp); 
-        } 	
-	//Tokenizer chunkTokens = new Tokenizer(line);
-       /*StringTokenizer tokenizer = new StringTokenizer(line);
-       while (tokenizer.hasMoreTokens()) {
-         word.set(tokenizer.nextToken());
-         context.write(word, one);
-         context.getCounter(Counters.INPUT_WORDS).increment(1);
-       }
-
-       if ((++numRecords % 100) == 0) {
-         context.setStatus("Finished processing " + numRecords
-             + " records " + "from the input file: " + inputFile);
-       }*/
      }
    }
 
@@ -216,7 +164,7 @@ public class Ngram extends Configured implements Tool {
      job.setReducerClass(Reduce.class);
 
      // Note that these are the default.
-     job.setInputFormatClass(WholeFileTextInputFormat.class);
+     job.setInputFormatClass(WholePageTextInputFormat.class);
      job.setOutputFormatClass(TextOutputFormat.class);
 
      int ngram_num = Integer.parseInt(args[0]);

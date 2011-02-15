@@ -1,2 +1,2 @@
-javac -cp ${HADOOP_HOME}/hadoop-common-0.21.0.jar:${HADOOP_HOME}/hadoop-hdfs-0.21.0.jar:${HADOOP_HOME}/hadoop-mapred-0.21.0.jar -d  class_dir Tokenizer.java WholeFileTextInputFormat.java NgramTokenizer.java ScoreTitleRecord.java Ngram.java
+javac -cp ${HADOOP_HOME}/hadoop-common-0.21.0.jar:${HADOOP_HOME}/hadoop-hdfs-0.21.0.jar:${HADOOP_HOME}/hadoop-mapred-0.21.0.jar -d  class_dir Tokenizer.java WholePageTextInputFormat.java  WholeFileTextInputFormat.java NgramTokenizer.java ScoreTitleRecord.java Ngram.java
 jar -cvf ngram.jar -C class_dir/ .
