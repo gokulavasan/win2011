@@ -1,0 +1,39 @@
+
+# Comment out the following line to generate release code
+DEBUG = 1
+
+# If you want to run cuda-gdb uncomment the -G option in the cuda debug options below
+# Note that if you want to run on your own machine you may have to
+# change the NVCCFLAGS to be an earlier streaming multiprocessor version
+# Replacing 20 with 12 or 13 will most likely work
+NVCCFLAGS   = -arch=compute_20 
+ifdef DEBUG
+NVCCFLAGS   += -g #-G
+else
+NVCCFLAGS   +=
+endif
+
+
+ifdef DEBUG
+GCCFLAGS    += -g
+else
+GCCFLAGS    +=
+endif
+
+all: main.o ImageCleaner.o JPEGWriter.o CpuReference.o
+	nvcc -L /usr/local/cuda/lib -lcudart -ljpeg -o ImageCleaner main.o ImageCleaner.o JPEGWriter.o CpuReference.o
+
+main.o: main.cc
+	g++ -I /usr/local/cuda/include -c -o main.o main.cc $(GCCFLAGS)
+
+ImageCleaner.o: ImageCleaner.cu
+	nvcc -c -o ImageCleaner.o ImageCleaner.cu $(NVCCFLAGS)
+
+JPEGWriter.o: JPEGWriter.cc
+	g++ -c -o JPEGWriter.o JPEGWriter.cc $(GCCFLAGS)
+
+CpuReference.o: CpuReference.cc
+	g++ -c -o CpuReference.o CpuReference.cc $(GCCFLAGS)
+
+clean:
+	rm -f *~ *.o *.linkinfo ImageCleaner
