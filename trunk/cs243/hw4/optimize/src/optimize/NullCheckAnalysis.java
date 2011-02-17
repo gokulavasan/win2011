@@ -265,9 +265,15 @@ public class NullCheckAnalysis implements Flow.Analysis {
 	protected void kill (Quad quad) 
 	{
 		//String operandString = operand.getRegister().toString();
-		if (quad.getOperator()==Operator.NullCheck.NULL_CHECK.INSTANCE)
+		if (quad.getOperator() == Operator.NullCheck.NULL_CHECK.INSTANCE)
 	     	{
-	    		set.remove(quad.getUsedRegisters());
+			Set<String> toRemove = new TreeSet<String>();		
+	    		//set.remove(quad.getUsedRegisters());
+                		for (Operand.RegisterOperand def : quad.getUsedRegisters())
+                    		// if quad defines the same register, kill it
+                        			toRemove.add(def.getRegister().toString());
+   
+			set.removeAll(toRemove);
              	}
 	}
     }
