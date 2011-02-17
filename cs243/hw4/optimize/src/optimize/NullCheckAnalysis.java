@@ -88,13 +88,31 @@ public class NullCheckAnalysis implements Flow.Analysis {
 
 
 
-    public void postprocess(ControlFlowGraph cfg) {
-        System.out.println("entry: " + entry.toString());
+    public void postprocess(ControlFlowGraph cfg) 
+    {
+       /* System.out.println("entry: " + entry.toString());
         for (int i=1; i<in.length; i++){
-            System.out.println(i + " in:  " + in[i].toString());
-            System.out.println(i + " out: " + out[i].toString());
+           System.out.println(i + " in:  " + in[i].toString());
+           System.out.println(i + " out: " + out[i].toString());
         }
         System.out.println("exit: " + exit.toString());
+	*/
+	QuadIterator qit = new QuadIterator(cfg);
+	while(qit.hasNext())
+	{
+		Quad qd = qit.next();
+		if (qd.getOperator() == Operator.NullCheck.NULL_CHECK.INSTANCE)
+		{
+			Flow.DataflowObject s = getIn(qd);
+			for (Operand.RegisterOperand def : qd.getUsedRegisters())
+			{
+				if (checkInc(s,def.getRegister().toString()))
+				{
+					System.out.println(qd.getID());
+				}
+			}
+		}
+	}		
     }
 
     /**
@@ -124,6 +142,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
 	result.copy(entry);
 	return result;
     }
+    
 
     /**
      * @return a copy of the exit node
@@ -144,6 +163,12 @@ public class NullCheckAnalysis implements Flow.Analysis {
 	Flow.DataflowObject result = newTempVar();
 	result.copy(in[quad.getID()]);
 	return result;
+    }
+    
+    public boolean checkInc (Flow.DataflowObject o, String s)
+    {
+	VarSet ov = (VarSet) o;
+	return ov.contains(s);
     }
 
     /**
@@ -234,7 +259,10 @@ public class NullCheckAnalysis implements Flow.Analysis {
             VarSet a = (VarSet) o;
             set = new TreeSet<String>(a.set);
         }
-
+	public boolean contains (String s)
+	{
+			return set.contains(s);
+	}
         @Override
         public boolean equals(Object o) 
         {
