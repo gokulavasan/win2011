@@ -26,8 +26,8 @@ public class FindRedundantNullChecks {
 	for (i = 0; i < args.length; i++)
 	{
 		Helper.runPass(classes[i], nullSolve);
-		System.out.println(args[i]);
-		System.out.println(nullSolve.toString());	
+		//System.out.println(args[i]);
+		//System.out.println(nullSolve.toString());	
 	}
     }
 }
