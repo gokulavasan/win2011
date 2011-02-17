@@ -43,7 +43,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
 
 
     public void preprocess(ControlFlowGraph cfg) {
-        System.out.println("Method: "+cfg.getMethod().getName().toString());
+        System.out.print(cfg.getMethod().getName().toString()+" " );
         /* Generate initial conditions. */
         QuadIterator qit = new QuadIterator(cfg);
         int max = 0;
@@ -83,7 +83,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
             out[i] = new VarSet();
         }
 
-        System.out.println("Initialization completed.");
+        //System.out.println("Initialization completed.");
     }
 
 
@@ -106,13 +106,14 @@ public class NullCheckAnalysis implements Flow.Analysis {
 			Flow.DataflowObject s = getIn(qd);
 			for (Operand.RegisterOperand def : qd.getUsedRegisters())
 			{
-				if (checkInc(s,def.getRegister().toString()))
+				if (!checkInc(s,def.getRegister().toString()))
 				{
-					System.out.println(qd.getID());
+					System.out.print(qd.getID()+ " ");
 				}
 			}
 		}
-	}		
+	}
+	System.out.println();		
     }
 
     /**
@@ -305,125 +306,6 @@ public class NullCheckAnalysis implements Flow.Analysis {
              	}
 	}
     }
-
-    /*public static class DefinitionSet implements Flow.DataflowObject {
-        public static final DefinitionSet allDefinitions = new DefinitionSet();
-
-        /**
-         * the set of definitions
-         
-        private HashSet<Quad> definitions;
-
-        /**
-         * Constructor
-         
-        public DefinitionSet() {
-            definitions = new HashSet<Quad>();
-        }
-
-        /**
-         * Sets the definition set to the top value, which is an empty set
-         
-        public void setToTop() {
-            definitions.clear();
-        }
-
-        /**
-         * Sets the definition set to the bottom value, which is the
-         * universal set
-         
-        public void setToBottom() {
-            copy(allDefinitions);
-        }
-
-        /**
-         * Performs a meet with another definition set. This is simply the
-         * union of both sets.
-         * @param moreDefinitions the set of definitions to meet with
-         
-        public void meetWith(Flow.DataflowObject moreDefinitions) {
-            definitions.addAll(((DefinitionSet)moreDefinitions).definitions);
-        }
-
-        /**
-         * Copies another definition set by emptying all existing
-         * definitions and copying the other set's definitions.
-         * @param otherDefinitions the definition set to copy
-         
-        public void copy(Flow.DataflowObject otherDefinitions) {
-            setToTop();
-            meetWith(otherDefinitions);
-        }
-
-        /**
-         * @return a string representation of the definition set.
-         
-        @Override
-        public String toString() {
-            // create a sorted set of the quad IDs
-            TreeSet<Integer> quadIDs = new TreeSet<Integer>();
-            for (Quad def : definitions) {
-                quadIDs.add(def.getID());
-            }
-
-            // return the sorted ID set string
-            return quadIDs.toString();
-        }
-
-        /**
-         * Checks whether this definition set is equal to another.
-         * @param otherDefinitions the definition set to compare with
-         * @return true if the two definition sets are equal, false
-         * otherwise
-         
-        @Override
-        public boolean equals(Object otherDefinitions) {
-            if(otherDefinitions instanceof DefinitionSet) {
-                return definitions.equals(((DefinitionSet)otherDefinitions).definitions);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return 1;
-        }
-
-        /**
-         * Adds a new definition to this definition set.
-         * @param quad the quad holding the definition to add
-         
-        protected void addDefinition(Quad quad) {
-            definitions.add(quad.getDefinedRegisters());
-        }
-
-        
-        // Kills definitions that define the given operand
-        // @param operand the operand to kill definitions with
-         
-        protected void kill(Operand.RegisterOperand operand) {
-            // the operand's string
-            String operandString = operand.getRegister().toString();
-            // iterate over the definitions in this set
-            HashSet<Quad> toRemove = new HashSet<Quad>();
-            /*for (Quad quad : definitions) {
-                // iterate over defined registers in the quad
-                for (Operand.RegisterOperand def : quad.getDefinedRegisters())
-                    // if quad defines the same register, kill it
-                    if(operandString.equals(def.getRegister().toString()))
-                        toRemove.add(quad);
-            }
-	    for (Quad quad : definitions) 
-	    {
-             if (quad.getOperator()==Operator.NullCheck.INSTANCE)
-	     {
-	    	toRemove.add(quad.getSrc);
-             }	
-            } 
-            // remove killed definitions from the definition set
-            definitions.removeAll(toRemove);
-        }
-    }*/
 
 
     /**
