@@ -18,10 +18,16 @@ public class FindRedundantNullChecks {
 	jq_Class[] classes = new jq_Class[args.length];
 	for (i = 0; i < args.length; i++)
 	{
-		ReferenceSolver nullSolve = new ReferenceSolver();
-		nullSolve.registerAnalysis(new NullCheckAnalysis());
+		classes[i] = (jq_Class)Helper.load(args[i]);
+	}
+	
+	ReferenceSolver nullSolve = new ReferenceSolver();
+	nullSolve.registerAnalysis(new NullCheckAnalysis());
+	for (i = 0; i < args.length; i++)
+	{
 		Helper.runPass(classes[i], nullSolve);
-		System.out.println(args[i]);	
+		System.out.println(args[i]);
+		System.out.println(nullSolve.toString());	
 	}
     }
 }
