@@ -98,6 +98,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
         System.out.println("exit: " + exit.toString());
 	*/
 	QuadIterator qit = new QuadIterator(cfg);
+	List<Integer> quadlist = new ArrayList<Integer>();
 	while(qit.hasNext())
 	{
 		Quad qd = qit.next();
@@ -108,10 +109,17 @@ public class NullCheckAnalysis implements Flow.Analysis {
 			{
 				if (checkInc2(s,def.getRegister().toString()))
 				{
-					System.out.print(qd.getID()+ " ");
+					quadlist.add(qd.getID());
+					//System.out.print(qd.getID()+ " ");
 				}
 			}
 		}
+	}
+	java.util.Collections.sort(quadlist);
+	int i;
+	for (i=0;i<quadlist.size();i++)
+	{
+		System.out.print(quadlist.get(i)+ " ");
 	}
 	System.out.println();		
     }
