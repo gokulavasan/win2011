@@ -106,7 +106,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
 			Flow.DataflowObject s = getIn(qd);
 			for (Operand.RegisterOperand def : qd.getUsedRegisters())
 			{
-				if (!checkInc(s,def.getRegister().toString()))
+				if (checkInc2(s,def.getRegister().toString()))
 				{
 					System.out.print(qd.getID()+ " ");
 				}
@@ -170,6 +170,12 @@ public class NullCheckAnalysis implements Flow.Analysis {
     {
 	VarSet ov = (VarSet) o;
 	return ov.contains(s);
+    }
+	 
+    public boolean checkInc2 (Flow.DataflowObject o, String s)
+    {
+	VarSet ov = (VarSet) o;
+	return ov.contains2(s);
     }
 
     /**
@@ -243,26 +249,49 @@ public class NullCheckAnalysis implements Flow.Analysis {
     public static class VarSet implements Flow.DataflowObject 
     {
         private Set<String> set;
+	private Set<String> nullChecked;
+
         public static Set<String> universalSet;
-        public VarSet() { set = new TreeSet<String>(); }
+        public VarSet() 
+	{ set = new TreeSet<String>(); 
+	  nullChecked = new TreeSet<String>();	
+	}
 
-        public void setToTop() { set = new TreeSet<String>(); }
-        public void setToBottom() { set = new TreeSet<String>(universalSet); }
+        public void setToTop() 
+	{ 
+		set = new TreeSet<String>(); 
+		nullChecked = new TreeSet<String>(universalSet);
+	}
+        public void setToBottom() 
+	{ 
+		set = new TreeSet<String>(universalSet); 
+		nullChecked = new TreeSet<String>();
+	}
 
+	public void addChecked(String s)
+	{
+		nullChecked.add(s);
+	}
         public void meetWith(Flow.DataflowObject o) 
         {
             VarSet a = (VarSet)o;
             set.addAll(a.set);
+	    nullChecked.retainAll(a.nullChecked);	
         }
 
         public void copy(Flow.DataflowObject o) 
         {
             VarSet a = (VarSet) o;
             set = new TreeSet<String>(a.set);
+	    nullChecked = new TreeSet<String>(a.nullChecked);	
         }
-	public boolean contains (String s)
+        public boolean contains (String s)
 	{
-			return set.contains(s);
+		return set.contains(s);
+	}
+	public boolean contains2 (String s)
+	{
+		return nullChecked.contains(s);
 	}
         @Override
         public boolean equals(Object o) 
@@ -270,7 +299,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
             if (o instanceof VarSet) 
             {
                 VarSet a = (VarSet) o;
-                return set.equals(a.set);
+                return (set.equals(a.set)&&nullChecked.equals(a.nullChecked));
             }
             return false;
         }
@@ -289,7 +318,8 @@ public class NullCheckAnalysis implements Flow.Analysis {
 
 	protected void add(String s)
 	{
-		set.add(s);	
+		set.add(s);
+		nullChecked.remove(s);	
 	}
 	protected void kill (Quad quad) 
 	{
@@ -299,8 +329,14 @@ public class NullCheckAnalysis implements Flow.Analysis {
 			Set<String> toRemove = new TreeSet<String>();		
 	    		//set.remove(quad.getUsedRegisters());
                 		for (Operand.RegisterOperand def : quad.getUsedRegisters())
+				{
                     		// if quad defines the same register, kill it
                         			toRemove.add(def.getRegister().toString());
+						//VarSet h = (VarSet)getIn(quad);
+						//h.addChecked(def.getRegister().toString());
+						if(set.contains(def.getRegister().toString()))
+							nullChecked.add(def.getRegister().toString());
+				}
    
 			set.removeAll(toRemove);
              	}
