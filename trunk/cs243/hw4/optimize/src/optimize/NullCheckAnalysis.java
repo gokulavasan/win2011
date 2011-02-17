@@ -334,7 +334,7 @@ public class NullCheckAnalysis implements Flow.Analysis {
                         			toRemove.add(def.getRegister().toString());
 						//VarSet h = (VarSet)getIn(quad);
 						//h.addChecked(def.getRegister().toString());
-						if(set.contains(def.getRegister().toString()))
+						//if(set.contains(def.getRegister().toString()))
 							nullChecked.add(def.getRegister().toString());
 				}
    
