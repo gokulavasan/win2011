@@ -1,0 +1,4 @@
+AddressBook.java:63 Concrete: MaleRecord @ 6 || Record/name || AddressBook.java:69 Concrete: MaleRecord @ 34 || Record/name
+AddressBook.java:69 Concrete: MaleRecord @ 34 || Record/name || AddressBook.java:63 Concrete: MaleRecord @ 6 || Record/name
+AddressBook.java:66 Concrete: FemaleRecord @ 20 || Record/emailAddr || AddressBook.java:67 Concrete: FemaleRecord @ 27 || Record/emailAddr
+AddressBook.java:67 Concrete: FemaleRecord @ 27 || Record/emailAddr || AddressBook.java:66 Concrete: FemaleRecord @ 20 || Record/emailAddr
