@@ -21,7 +21,7 @@ GCCFLAGS    +=
 endif
 
 all: main.o ImageCleaner.o JPEGWriter.o CpuReference.o
-	nvcc -L /usr/local/cuda/lib -lcudart -ljpeg -o ImageCleaner main.o ImageCleaner.o JPEGWriter.o CpuReference.o
+	nvcc -L /usr/local/cuda/lib64 -lcudart -ljpeg -o ImageCleaner main.o ImageCleaner.o JPEGWriter.o CpuReference.o
 
 main.o: main.cc
 	g++ -I /usr/local/cuda/include -c -o main.o main.cc $(GCCFLAGS)
