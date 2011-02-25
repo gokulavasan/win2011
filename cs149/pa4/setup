@@ -1,0 +1,2 @@
+setenv PATH /usr/local/cuda/bin:$PATH
+setenv LD_LIBRARY /usr/local/cuda/lib64:$LD_LIBRARY_PATH
