@@ -5,6 +5,8 @@
 #define SIZEX    512
 #define SIZEY    512
 
+#define PI 3.1415926536
+#define BLOCK_SIZE 512
 //----------------------------------------------------------------
 // TODO:  CREATE NEW KERNELS HERE.  YOU CAN PLACE YOUR CALLS TO
 //        THEM IN THE INDICATED SECTION INSIDE THE 'filterImage'
@@ -13,10 +15,103 @@
 // BEGIN ADD KERNEL DEFINITIONS
 //----------------------------------------------------------------
 
-// This is an example kernel defintion that you should consider using
-__global__ void exampleKernel(float *real_image, float *imag_image, int size_x, int size_y)
+__device__ float GetElement(const float *image, const int row, int col)
 {
-  // Currently does nothing
+    return image[row * SIZEX + col];
+}
+
+__device__ void SetElement(float *image, const int row, int col, float val)
+{
+    image[row * SIZEX + col] = val;
+}
+
+
+
+// This is an example kernel defintion that you should consider using
+__global__ void DFTKernel (float *real_image, float *imag_image,
+                            int size_x, int size_y, int direction, int forward)
+{
+  
+  int blockId = blockIdx.x;
+  int threadId = threadIdx.x;
+
+
+  float real_Xvalue[SIZEX/BLOCK_SIZE];
+  float imag_Xvalue[SIZEX/BLOCK_SIZE];
+  __shared__ float real_vect[BLOCK_SIZE];
+  __shared__ float imag_vect[BLOCK_SIZE];
+
+  for (int z = 0; z < SIZEX/BLOCK_SIZE ; ++z){
+    real_Xvalue[z] = 0;
+    imag_Xvalue[z] = 0;
+  }
+
+  for (int i = 0; i < SIZEX/BLOCK_SIZE; ++i){
+    
+    if (direction == 0) {
+      // Row direction 
+      real_vect[threadId] = GetElement(real_image, blockId, threadId + i*BLOCK_SIZE);
+      imag_vect[threadId] = GetElement(imag_image, blockId, threadId + i*BLOCK_SIZE);
+    }  else {
+      // Col direction
+      real_vect[threadId] = GetElement(real_image, threadId + i*BLOCK_SIZE, blockId);
+      imag_vect[threadId] = GetElement(imag_image, threadId + i*BLOCK_SIZE, blockId);
+    }
+  
+    __syncthreads();
+    
+    // need to calculate the 'theta' value, based on thread id, 
+    //   and also different for forward and reverse
+    float theta = 0;
+    for (int z = 0; z < SIZEX/BLOCK_SIZE; ++z){
+      for (int e = 0; e < BLOCK_SIZE; ++e){
+        if (forward == 1) {
+          // Forward DFT
+          theta = -2*PI*threadId*(e+z*BLOCK_SIZE)/SIZEX;
+        } else {
+          // Inverse DFT
+          theta = 2*PI*threadId*(e+z*BLOCK_SIZE)/SIZEX;
+        }
+        real_Xvalue[z] += real_vect[e]*cosf(theta)-imag_vect[e]*sinf(theta);
+        imag_Xvalue[z] += imag_vect[e]*cosf(theta)+real_vect[e]*sinf(theta);
+      }
+    }
+    __syncthreads();
+  }
+
+  for (int z = 0; z < SIZEX/BLOCK_SIZE ;++z){
+    if (forward != 1){
+      real_Xvalue[z] /= SIZEX;
+      imag_Xvalue[z] /= SIZEX;
+    }
+    if (forward == 1 && direction ==1) {
+      const int eightX = SIZEX/8;
+      const int eight7X = SIZEX - eightX;
+      const int eightY = SIZEY/8;
+      const int eight7Y = SIZEY - eightY;
+  
+      int x = threadId+z*BLOCK_SIZE;
+      int y = blockId;
+  
+      if (!(x < eightX && y < eightY) &&
+          !(x < eightX && y >= eight7Y) &&
+          !(x >= eight7X && y < eightY) &&
+          !(x >= eight7X && y >= eight7Y))
+         {
+         real_Xvalue[z]=0;
+         imag_Xvalue[z]=0;
+      }
+    }
+
+    if (direction ==0){
+      SetElement(real_image, blockId, threadId+z*BLOCK_SIZE, real_Xvalue[z]);
+      SetElement(imag_image, blockId, threadId+z*BLOCK_SIZE, imag_Xvalue[z]);
+    } else {
+      SetElement(real_image, threadId+z*BLOCK_SIZE, blockId, real_Xvalue[z]);
+      SetElement(imag_image, threadId+z*BLOCK_SIZE, blockId, imag_Xvalue[z]);
+    }
+  }
+
 }
 
 //----------------------------------------------------------------
@@ -78,13 +173,19 @@ __host__ float filterImage(float *real_image, float *imag_image, int size_x, int
   //    4. Stream to execute kernel on, should always be 'filterStream'
   //
   // Also note that you pass the pointers to the device memory to the kernel call
-  exampleKernel<<<1,128,0,filterStream>>>(device_real,device_imag,size_x,size_y);
+  DFTKernel<<<size_y,BLOCK_SIZE,0,filterStream>>>(device_real,device_imag,size_x,size_y,0,1);
+  DFTKernel<<<size_x,BLOCK_SIZE,0,filterStream>>>(device_real,device_imag,size_x,size_y,1,1);
+
+
+ 
+  DFTKernel<<<size_y,BLOCK_SIZE,0,filterStream>>>(device_real,device_imag,size_x,size_y,0,0);
+  DFTKernel<<<size_x,BLOCK_SIZE,0,filterStream>>>(device_real,device_imag,size_x,size_y,1,0);
+
 
 
   //---------------------------------------------------------------- 
   // END ADD KERNEL CALLS
   //----------------------------------------------------------------
-
   // Finish timimg for the execution 
   CUDA_ERROR_CHECK(cudaEventRecord(stop,filterStream));
   CUDA_ERROR_CHECK(cudaEventSynchronize(stop));
