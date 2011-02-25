@@ -107,9 +107,12 @@ int main(int argc, char **argv)
     // Better have found it
     assert(index >= 0);
     std::string outFileName = tempFileName.substr(0,index);
+    std::string outRefFileName = tempFileName.substr(0,index);
     outFileName.append("_out.jpg");
+    outRefFileName.append("_ref_out.jpg");
     printf("Writing out CUDA generated image to %s\n\n", outFileName.c_str());
     write_jpeg(outFileName.c_str(), real_image, imag_image, size_x, size_y); 
+    write_jpeg(outRefFileName.c_str(), real_image_ref, imag_image_ref, size_x, size_y); 
   }
   // Clean up the memory
   delete [] real_image;
