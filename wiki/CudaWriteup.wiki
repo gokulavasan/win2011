@@ -1,0 +1,15 @@
+#summary Cuda Filter Writeup
+
+= Introduction =
+
+Our cuda implementation gives a speedup of 300x on the given examples.  We fix the block size given the assignment constraints.  We reduce memory access by reusing data that is pulled from main memory as much as possible.  The resulting images match the reference.
+
+= Details =
+
+Block size is fixed at 256 given the minimum size requirements as stated in the assignment page.  Because the image is constrained to square and power of two dimensions, we do not worry about 'extra' threads.
+
+We launch our kernel that is parameterized for the row/column and forward/reverse dft.  The kernel is launched with a fixed 256 threads that act on one row/column depending on what mode.  So, for a given 512x512 image, we launch 512 blocks with 256 threads each.
+
+Within the kernel, each thread pulls a single coordinate (real and imag) from main memory based on block and thread id.  We sync threads to invoke a barrier.  At this time, we change the thread to represent the kth frequency that we are calculating.  Each thread loops over the data that was pulled in and accumulates the calculated sum.  We sync_threads again at this point.  This is because we have fixed the thread count at 256, so we need to redo this section of code repeatedly to pull in the other 256 sized blocks of the image and process them (accumulating the total into the frequencies).  So on each of these loop iterations, a thread pulls in one coordinate and calculates/accumulates all the 256 data points for image_size/256 number of frequencies that have been assigned to it.
+
+The last part is when we do the filtering which is a simply copied out of the reference code and run serially in each thread.   
