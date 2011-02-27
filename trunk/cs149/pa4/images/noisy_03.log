@@ -1,0 +1,15 @@
+Selecting GPU 0 of type GeForce GTX 560 Ti
+
+REFERENCE IMPLEMENTATION STATISTICS:
+  Reference Kernel Execution Time: 833797.875000 ms
+
+CUDA IMPLEMENTATION STATISTICS:
+  Host to Device Transfer Time: 3.632160 ms
+  Kernel(s) Execution Time: 1977.432373 ms
+  Device to Host Transfer Time: 3.950432 ms
+  Total CUDA Execution Time: 1985.015015 ms
+
+TOTAL SPEEDUP: 420.046143
+
+Writing out CUDA generated image to images/noisy_03_out.jpg
+
