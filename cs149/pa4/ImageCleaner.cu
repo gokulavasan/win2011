@@ -6,7 +6,7 @@
 #define SIZEY    512
 
 #define PI 3.1415926536
-#define BLOCK_SIZE 512
+#define BLOCK_SIZE 256
 //----------------------------------------------------------------
 // TODO:  CREATE NEW KERNELS HERE.  YOU CAN PLACE YOUR CALLS TO
 //        THEM IN THE INDICATED SECTION INSIDE THE 'filterImage'
@@ -47,7 +47,7 @@ __global__ void DFTKernel (float *real_image, float *imag_image,
   }
 
   for (int i = 0; i < SIZEX/BLOCK_SIZE; ++i){
-    
+    // i represents which block along the entire image vector
     if (direction == 0) {
       // Row direction 
       real_vect[threadId] = GetElement(real_image, blockId, threadId + i*BLOCK_SIZE);
@@ -67,10 +67,10 @@ __global__ void DFTKernel (float *real_image, float *imag_image,
       for (int e = 0; e < BLOCK_SIZE; ++e){
         if (forward == 1) {
           // Forward DFT
-          theta = -2*PI*threadId*(e+z*BLOCK_SIZE)/SIZEX;
+          theta = -2*PI*(threadId+z*BLOCK_SIZE)*(e+i*BLOCK_SIZE)/SIZEX;
         } else {
           // Inverse DFT
-          theta = 2*PI*threadId*(e+z*BLOCK_SIZE)/SIZEX;
+          theta = 2*PI*(threadId+z*BLOCK_SIZE)*(e+i*BLOCK_SIZE)/SIZEX;
         }
         real_Xvalue[z] += real_vect[e]*cosf(theta)-imag_vect[e]*sinf(theta);
         imag_Xvalue[z] += imag_vect[e]*cosf(theta)+real_vect[e]*sinf(theta);
