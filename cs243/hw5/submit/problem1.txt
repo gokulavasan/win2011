@@ -1,3 +1,15 @@
+Useful ones seem to be the ones that actually show real aliases.  These would
+be:
+
+AddressBook.java:63 Concrete: MaleRecord @ 6 || Record/name || AddressBook.java:69 Concrete: MaleRecord @ 34 || Record/name
+AddressBook.java:69 Concrete: MaleRecord @ 34 || Record/name || AddressBook.java:63 Concrete: MaleRecord @ 6 || Record/name
+AddressBook.java:66 Concrete: FemaleRecord @ 20 || Record/emailAddr || AddressBook.java:67 Concrete: FemaleRecord @ 27 || Record/emailAddr
+AddressBook.java:67 Concrete: FemaleRecord @ 27 || Record/emailAddr || AddressBook.java:66 Concrete: FemaleRecord @ 20 || Record/emailAddr 
+
+Noisy: Same obj/field pointing to same obj/field is not very useful.  
+       Also not sure how useful a static string pointing to an object/field is from an analysis point of view.
+       The Linked list information is also not very useful as by construction they are aliased, so by definition it is an alias but adds noise to our analysis.
+
 global(null) || AddressBook/joe || global(null) || AddressBook/joe
 AddressBook.java:63 Concrete: MaleRecord @ 6 || Record/name || global(null) || AddressBook/joe
 AddressBook.java:69 Concrete: MaleRecord @ 34 || Record/name || global(null) || AddressBook/joe

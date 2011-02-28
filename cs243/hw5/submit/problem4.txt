@@ -1,3 +1,16 @@
+The difference is with the context insensitive analysis, although it is field
+sensitive, links between objects and pointers only hold the field relation.
+Now where those relations are made (in which object instantiation) does not
+matter, and we add additional noise to the analysis.  For instance:
+
+Our JoeRecord/name in context insensitive analysis points to every name that
+was included in a Record instantiation.  This would not be very useful in
+determining the alias information found in problem #2.
+
+This is shown by 
+MaleRecord@6/name pointing to Joe,Mary,Bob and Jane and similarly for the
+email addresses.
+
 global(null) || AddressBook/joe || AddressBook.java:37 Concrete: String @ 1
 global(null) || AddressBook/joeEmail || AddressBook.java:38 Concrete: String @ 2
 global(null) || AddressBook/joeAltEmail || AddressBook.java:39 Concrete: String @ 3
