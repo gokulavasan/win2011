@@ -1,3 +1,17 @@
+Saving results: SIZE OF hP: 136.
+
+More than original 105 since we are loosening the restrictions by allowing any
+field to point to any field in another object.  The tuples in the insensitive
+version do not have a field entry as we have removed that restriction.  The
+insensitive analysis should be a superset of the sensitive analysis.  We see
+the additional results at for each Male/Female Record now pointing to many
+more strings.
+
+For example: the maryRecord in the sensitive analysis shows the emailAddr
+pointing to the email address string defined in address book.  Because we have
+removed this restriction in the insensitive analysis, we have the our
+maryRecord pointing to pretty much every string defined in the address book.
+
 global(null) || AddressBook.java:37 Concrete: String @ 1
 global(null) || AddressBook.java:38 Concrete: String @ 2
 global(null) || AddressBook.java:39 Concrete: String @ 3
@@ -59,8 +73,3 @@ LinkedList.java:778 Concrete: LinkedList$Entry @ 1 || AddressBook.java:63 Concre
 LinkedList.java:778 Concrete: LinkedList$Entry @ 1 || AddressBook.java:66 Concrete: FemaleRecord @ 20
 LinkedList.java:778 Concrete: LinkedList$Entry @ 1 || AddressBook.java:67 Concrete: FemaleRecord @ 27
 LinkedList.java:778 Concrete: LinkedList$Entry @ 1 || AddressBook.java:69 Concrete: MaleRecord @ 34
-
-
-Saving results: SIZE OF hP: 136.
-
-More than original 105
