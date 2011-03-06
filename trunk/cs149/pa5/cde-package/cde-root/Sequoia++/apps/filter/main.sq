@@ -1,0 +1,129 @@
+#include "ImageCleaner.h"
+#include "../../libs/include/sq_cstdio.h"
+#include "../../libs/include/sq_cassert.h"
+#include "../../libs/include/sq_jpeg.h"
+#include "../../libs/include/sq_ctime.h"
+#include "../../libs/include/sq_cstring.h"
+
+int main(int argc, char **argv)
+{
+  if(argc != 2)
+  {
+    sq_printf("Usage: sq.out noisy_image_file.nsy\n");
+    return 1;	
+  }
+  // Read in the noisy image file
+  char *fileName = argv[1];
+  sq_FILE *ifs = sq_fopen(fileName,"r");
+  
+  // Get the size of the image
+  int size_x, size_y;
+  sq_fscanf(ifs,"%d%d",&size_x,&size_y);
+  sq_assert((size_x > 0) && (size_y > 0));
+  
+  // Allocate space for the real and imaginary components of the image
+  float **real_image = new float*[size_x];
+  float **imag_image = new float*[size_x];
+  // Also allocate space for the reference implementation
+  float *real_image_ref = new float[size_x * size_y];
+  float *imag_image_ref = new float[size_x * size_y];
+
+  // Read in the components
+  for(unsigned int i=0; i< size_x; i++)
+  {
+    real_image[i] = new float[size_y];
+    imag_image[i] = new float[size_y];
+    for(unsigned int j=0; j<size_y; j++)
+    {
+      float real, imag;
+      // Read in both the real and imaginary parts
+      sq_fscanf(ifs,"%f%f",&real,&imag);
+      // Write them into the arrays
+      real_image[i][j] = real;
+      imag_image[i][j] = imag;
+      // Do the same for the reference
+      real_image_ref[i*size_x + j] = real;
+      imag_image_ref[i*size_x + j] = imag;
+    }
+  }
+  // Close the file since we're done with it now
+  sq_fclose(ifs);
+
+  float** tR1 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+     tR1[i] = new float[size_y];
+  float** tI1 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tI1[i] = new float[size_y];
+
+  float** tR2 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tR2[i] = new float[size_y];
+  float** tI2 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tI2[i] = new float[size_y];
+
+  float** tR3 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tR3[i] = new float[size_y];
+  float** tI3 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tI3[i] = new float[size_y];
+
+  float** tR4 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tR4[i] = new float[size_y]; 
+  float** tI4 = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    tI4[i] = new float[size_y];
+
+  float** RO = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    RO[i] = new float[size_y];
+  float** IO = new float*[size_x];
+  for ( int i = 0; i < size_x; i++ )
+    IO[i] = new float[size_y];
+
+  sq_microsecond_t cudaTime = sq_gettimeofday();
+  filterImage(real_image, imag_image, tR1, tI1, tR2, tI2, tR3, tI3, tR4, tI4, RO, IO);
+  cudaTime = (sq_gettimeofday() - cudaTime);
+  // Convert to milli-second
+  cudaTime /= 1000;
+  sq_printf("SEQUOIA IMPLEMENTATION STATISTICS:\n");
+  sq_printf("  Sequoia Kernel Execution Time: %f ms\n\n",cudaTime);
+
+  // We've got to convert the Sequoia output back into a format familiar
+  // to the JPEG library, we'll just overwrite the reference output since
+  // we're done with it
+  for(unsigned int i=0; i<size_x; i++)
+  {
+    for(unsigned int j=0; j<size_y; j++)
+    {
+      real_image_ref[i*size_x+j] = RO[i][j];
+      imag_image_ref[i*size_x+j] = IO[i][j];
+    }
+  }
+
+  // Dump the image to jpeg format for the cuda implementation
+  {
+    // Take off the '.nsy' postfix and post-pend '_out.jpg'
+    char * outFile = new char[sq_strlen(fileName)+5];
+    sq_strncpy(outFile,fileName,sq_strlen(fileName)-4);
+    outFile[sq_strlen(fileName)-4] = '\0';
+    outFile = sq_strcat( outFile,"_out.jpg");
+    sq_printf("Writing out CUDA generated image to %s\n\n", outFile);
+    write_jpeg(outFile, real_image_ref, imag_image_ref, size_x, size_y);
+  }
+  // Clean up the memory
+  for(unsigned int i=0; i<size_x; i++)
+  {
+    delete [] real_image[i];
+    delete [] imag_image[i];
+  }
+  delete [] real_image;
+  delete [] imag_image;
+  delete [] real_image_ref;
+  delete [] imag_image_ref; 
+
+  return 0; 
+}

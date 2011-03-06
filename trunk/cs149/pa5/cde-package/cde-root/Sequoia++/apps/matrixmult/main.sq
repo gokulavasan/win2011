@@ -1,0 +1,97 @@
+#include "matrixmult.h"
+#include "../../libs/include/sq_cstdio.h"
+#include "../../libs/include/sq_ctime.h"
+
+bool verify(float** c1, float** c2, unsigned int M, unsigned int N);
+
+int main()
+{
+	const unsigned int M = 256;
+	const unsigned int N = 256;
+	const unsigned int P = 256;
+
+	float numOps = 2. * (float)N * (float)M * (float)P;
+	float numXfer = (float)sizeof(float) * ((float)M * (float)N * 2.);
+	sq_microsecond_t sequoia_usec, start_usec, end_usec;
+
+	float** a = new float*[M];
+	for ( unsigned int i = 0; i < M; i++ )
+		a[i] = new float[P];
+	for ( unsigned int i = 0; i < M; i++ )
+		for ( unsigned int j = 0; j < P; j++ )
+			a[i][j] = static_cast<float>(i*10+j);
+
+	float** b = new float*[P];
+	for ( unsigned int i = 0; i < P; i++ )
+		b[i] = new float[N];
+	for ( unsigned int i = 0; i < P; i++ )
+		for ( unsigned int j = 0; j < N; j++ )
+			b[i][j] = ( i == j ) ? 1 : 0;
+
+	float** c1 = new float*[M];
+	float** c2 = new float*[M];
+	for ( unsigned int i = 0; i < M; i++ )
+	{
+		c1[i] = new float[N];
+		c2[i] = new float[N];
+	}
+	// Initialize the values
+	for( unsigned int i = 0; i < M; i++)
+	{
+		for( unsigned int j = 0; j<N; j++)
+		{
+			c1[i][j] = 0.0;
+			c2[i][j] = 0.0;
+		}
+	}
+	
+	start_usec = sq_gettimeofday();
+	matrixmult(a, b, c1);
+	end_usec = sq_gettimeofday();
+	sequoia_usec = end_usec - start_usec;
+
+	sq_printf("Sequoia total matrixmult running time: "
+			"%.4f usec -- %.4f GFLOPS -- %.4f GB/s\n",
+			sequoia_usec, 
+			sq_compute_gflops_from_usec(numOps, sequoia_usec),
+			sq_compute_gbsec_from_usec(numXfer, sequoia_usec));
+
+
+	reference(a, b, c2, M, N, P);
+
+	if ( verify(c1, c2, M, N) )
+		sq_printf("SUCCESS: Sequoia implementation matches reference implementation!\n");
+	else
+		sq_printf("ERROR: Sequoia implementation does not match reference implementation!\n");
+
+	for ( unsigned int i = 0; i < M; i++ )
+		delete [] a[i];
+	delete [] a;
+	
+	for ( unsigned int i = 0; i < P; i++ )
+		delete [] b[i];
+	delete [] b;
+	
+	for ( unsigned int i = 0; i < M; i++ )
+	{
+		delete c1[i];
+		delete c2[i];
+	}
+	delete [] c1;
+	delete [] c2;
+
+	return 0;
+}
+
+bool verify(float** c1, float** c2, unsigned int M, unsigned int N)
+{
+	for ( unsigned int i = 0; i < M; i++ )
+		for ( unsigned int j = 0; j < N; j++ )
+			if ( c1[i][j] != c2[i][j] )
+			{	
+				sq_printf("c1[%d][%d] = %f != c2[%d][%d] = %f\n", i, j, c1[i][j], i, j, c2[i][j]);
+				return false;
+			}
+				
+	return true;
+}
