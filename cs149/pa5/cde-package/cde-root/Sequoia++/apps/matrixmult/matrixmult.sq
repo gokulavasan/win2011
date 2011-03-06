@@ -1,0 +1,39 @@
+#include "matrixmult.h"
+
+task<inner> void matrixmult(in float a[M][P], in float b[P][N], inout float c[M][N])
+{
+  tunable mBlock;
+  tunable pBlock;
+  tunable nBlock;
+  
+  mappar ( int i = 0 : M/mBlock, int j = 0 : N/nBlock )
+  {
+  	mapseq ( int k = 0 : P/pBlock )
+        {
+  		matrixmult(a[i*mBlock;mBlock][k*pBlock;pBlock], b[k*pBlock;pBlock][j*nBlock;nBlock], c[i*mBlock;mBlock][j*nBlock;nBlock]);
+        }
+    }
+}
+
+task<leaf> void matrixmult(in float a[M][P], in float b[P][N], inout float c[M][N])
+{
+	for ( unsigned int i = 0; i < M; i++ )
+		for ( unsigned int j = 0; j < N; j++ )
+		{
+			float temp = 0.0f;
+			for ( unsigned int k = 0; k < P; k++ )
+				temp += a[i][k] * b[k][j];
+			c[i][j] += temp;
+		}
+}
+
+void reference(float** a, float** b, float** c, unsigned int M, unsigned int N, unsigned int P)
+{
+	for ( unsigned int i = 0; i < M; i++ )
+		for ( unsigned int j = 0; j < N; j++ )
+		{
+			c[i][j] = 0.0;
+			for ( unsigned int k = 0; k < P; k++ )
+				c[i][j] += a[i][k] * b[k][j];
+		}
+}

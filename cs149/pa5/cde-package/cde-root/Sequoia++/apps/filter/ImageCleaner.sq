@@ -1,0 +1,73 @@
+#include "ImageCleaner.h"
+
+#include "../libs/include/sq_cmath.h"
+
+#ifndef PI
+#define PI (3.14159265)
+#endif
+
+// This is the entrypoint task.
+task<inner> void filterImage(inout float real_image[N][N], inout float imag_image[N][N], inout float tR1[N][N], inout float tI1[N][N], inout float tR2[N][N], inout float tI2[N][N], inout float tR3[N][N], inout float tI3[N][N], inout float tR4[N][N], inout float tI4[N][N], inout float RO[N][N], inout float IO[N][N])
+{
+	// DO NOT MODIFY THIS!
+	fftX(real_image, imag_image, tR1, tI1, 0);
+	fftY(tR1, tI1, tR2, tI2, 0);
+	lowPass(tR2, tI2, tR3, tI3, 0, 0);
+	ifftY(tR3, tI3, tR4, tI4, 0);
+	ifftX(tR4, tI4, RO, IO, 0);
+}
+
+//************************************//
+// CS149: FILL IN THE FOLLOWING TASKS //
+//************************************//
+
+task<inner> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
+{
+
+}
+
+task<leaf> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
+{
+
+}
+
+task<inner> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
+{
+
+}
+
+task<leaf> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
+{
+
+}
+
+task<inner> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
+{
+
+}
+
+task<leaf> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
+{
+
+}
+
+task<inner> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
+{
+
+}
+
+task<leaf> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
+{
+
+}
+
+task<inner> void lowPass(in float oldReal[M][N], in float oldImag[M][N], inout float newReal[M][N], inout float newImag[M][N], in int position_x, in int position_y)
+{
+
+}
+
+task<leaf> void lowPass(in float oldReal[M][N], in float oldImag[M][N], inout float newReal[M][N], inout float newImag[M][N], in int position_x, in int position_y)
+{
+
+}
+
