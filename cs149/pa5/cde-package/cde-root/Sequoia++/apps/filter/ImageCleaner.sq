@@ -48,7 +48,7 @@ task<leaf> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout f
   {
    for (unsigned int n = 0; n < NO; n++)
    {
-	float term = (-2 * 3.14159 * y * (n+position_y))/512;
+	float term = (-2 * PI * y * (n+position_y))/512;
         fft_real[n] = sq_cos(term);
         fft_imag[n] = sq_sin(term);
    }
@@ -96,7 +96,7 @@ task<leaf> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
   {
    for (unsigned int n = 0; n < NO; n++)
    {
-	float term = (-2 * 3.14159 * y * (n+position_y))/512;
+	float term = (2 * PI * y * (n+position_y))/512;
         fft_real[n] = sq_cos(term);
         fft_imag[n] = sq_sin(term);
    }
@@ -147,7 +147,7 @@ task<leaf> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout f
   {
    for (unsigned int n = 0; n < MO; n++)
    {
-    float term = (2 * 3.14159 * x * (n + position_x))/512;
+    float term = (-2 * PI * x * (n + position_x))/512;
     fft_real[n] = sq_cos(term);
     fft_imag[n] = sq_sin(term);
    }
@@ -189,6 +189,7 @@ task<leaf> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
  float *fft_real = new float[MO];
  float *fft_imag = new float[MO];
  
+ 
  for (unsigned int y = 0; y < NN; y++)
  {
   for (unsigned int x = 0; x < MN; x++)
@@ -214,6 +215,7 @@ task<leaf> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
    newImag[x][y] += imagOutBuffer;
   }
  }
+
  delete [] fft_real;
  delete [] fft_imag;
 
