@@ -39,7 +39,7 @@ instance fftX fftX_1(level 1) inner
 {
  tunable mBlock = 512;
  tunable nBlock = 512;
- //footprint (4194304, bytes);
+ footprint (1024, bytes);
  data()
  {
   array oldReal() { elements = 512, 512;}
@@ -55,7 +55,9 @@ instance fftX fftX_1(level 1) inner
  }
 }
 
-instance fftX fftX_2 (level 0) leaf { } 
+instance fftX fftX_2 (level 0) leaf {
+footprint(1024, bytes);
+ } 
 
 // IFFTX ......................................................................
 // ............................................................................
@@ -65,7 +67,7 @@ instance ifftX ifftX_1(level 1) inner
  tunable mBlock = 512;
  tunable nBlock = 512;
 
- //footprint (4194304, bytes);
+ footprint (1024, bytes);
  data()
  {
   array oldReal() { elements = 512, 512;}
@@ -81,7 +83,9 @@ instance ifftX ifftX_1(level 1) inner
  }
 }
 
-instance ifftX ifftX_2 (level 0) leaf { }
+instance ifftX ifftX_2 (level 0) leaf { 
+ footprint (1024, bytes);
+}
 
 // FFTY .......................................................................
 // ............................................................................
@@ -91,7 +95,7 @@ instance fftY fftY_1(level 1) inner
  tunable mBlock = 512;
  tunable nBlock = 512;
 
- //footprint (4194304, bytes);
+ footprint (1024, bytes);
  data()
  {
   array oldReal() { elements = 512, 512;}
@@ -107,7 +111,9 @@ instance fftY fftY_1(level 1) inner
  }
 }
 
-instance fftY fftY_2 (level 0) leaf { }
+instance fftY fftY_2 (level 0) leaf {
+ footprint(1024, bytes);
+ }
 
 // IFFTY ......................................................................
 // ............................................................................
@@ -117,7 +123,7 @@ instance ifftY ifftY_1(level 1) inner
  tunable mBlock = 512;
  tunable nBlock = 512;
 
- //footprint (4194304, bytes);
+ footprint (1024, bytes);
  data()
  {
   array oldReal() { elements = 512, 512;}
@@ -133,7 +139,9 @@ instance ifftY ifftY_1(level 1) inner
  }
 }
 
-instance ifftY ifftY_2 (level 0) leaf { } 
+instance ifftY ifftY_2 (level 0) leaf {
+ footprint(1024, bytes);
+ } 
 
 // LOW PASS ...................................................................
 // ............................................................................
@@ -142,7 +150,7 @@ instance lowPass lowPass_1(level 1) inner
 {
  tunable mBlock = 512;
  tunable nBlock = 512;
- 
+ footprint (1024, bytes); 
  data()
  {
   array oldReal() { elements = 512,512;}
@@ -158,4 +166,6 @@ instance lowPass lowPass_1(level 1) inner
  }
 } 
 
-instance lowPass lowPass_2 (level 0) leaf { } 
+instance lowPass lowPass_2 (level 0) leaf {
+ footprint (1024, bytes);
+ } 

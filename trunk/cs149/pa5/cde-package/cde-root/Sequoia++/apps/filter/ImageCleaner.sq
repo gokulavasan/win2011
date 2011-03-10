@@ -129,7 +129,7 @@ task<inner> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
  {
   mapseq (int i=0 : MO/mBlock)
   { 
-   ifftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
+   fftY(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
   }
  }
 }
@@ -177,7 +177,7 @@ task<inner> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout
  {
   mapseq (int i=0 : MO/mBlock)
   {
-   ifftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
+   ifftY(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
   }
  }
 }
