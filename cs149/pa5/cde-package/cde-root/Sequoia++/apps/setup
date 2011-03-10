@@ -1,0 +1,2 @@
+setenv SQ_LD_DIR ~/pa5/cde-package/cde-root/Sequoia++/libs
+setenv SQ_RT_DIR ~/pa5/cde-package/cde-root/Sequoia++/runtime

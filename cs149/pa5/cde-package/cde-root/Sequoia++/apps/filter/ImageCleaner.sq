@@ -1,6 +1,6 @@
 #include "ImageCleaner.h"
 
-#include "../libs/include/sq_cmath.h"
+#include "../../libs/include/sq_cmath.h"
 
 #ifndef PI
 #define PI (3.14159265)
@@ -23,51 +23,233 @@ task<inner> void filterImage(inout float real_image[N][N], inout float imag_imag
 
 task<inner> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
 {
+ tunable mBlock;
+ tunable nBlock;
 
+ mappar (int i=0 : MO/mBlock)
+ {
+  mapseq (int j=0 : NO/nBlock)
+  {
+   fftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[i*mBlock;mBlock][0;NN],newImag[i*mBlock;mBlock][0;NN], j*nBlock);
+  }
+ }
 }
 
 task<leaf> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
 {
+ float realOutBuffer;
+ float imagOutBuffer;
+ float *fft_real = new float[NO];
+ float *fft_imag = new float[NO];
 
+ for (unsigned int x = 0; x < MN; x++)
+ {
+  for (unsigned int y = 0; y < NN; y++)
+  {
+   for (unsigned int n = 0; n < NO; n++)
+   {
+	float term = (-2 * 3.14159 * y * (n+position_y))/512;
+        fft_real[n] = sq_cos(term);
+        fft_imag[n] = sq_sin(term);
+   }
+   realOutBuffer = 0.0f;
+   imagOutBuffer = 0.0f;
+   
+   for (unsigned int n = 0; n < NO; n++)
+   {
+     realOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+     imagOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+   }
+   
+   newReal[x][y] += realOutBuffer;
+   newImag[x][y] += imagOutBuffer;
+  }
+ }
+ delete [] fft_real;
+ delete [] fft_imag;
 }
 
 task<inner> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
 {
+ tunable mBlock;
+ tunable nBlock;
 
+ mappar (int i=0 : MO/mBlock)
+ {
+  mapseq (int j=0 : NO/nBlock)
+  {
+   ifftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[i*mBlock;mBlock][0;NN],newImag[i*mBlock;mBlock][0;NN], j*nBlock);
+  }
+ }
 }
 
 task<leaf> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_y)
 {
+ float realOutBuffer;
+ float imagOutBuffer;
+ float *fft_real = new float[NO];
+ float *fft_imag = new float[NO];
+
+ for (unsigned int x = 0; x < MN; x++)
+ {
+  for (unsigned int y = 0; y < NN; y++)
+  {
+   for (unsigned int n = 0; n < NO; n++)
+   {
+	float term = (-2 * 3.14159 * y * (n+position_y))/512;
+        fft_real[n] = sq_cos(term);
+        fft_imag[n] = sq_sin(term);
+   }
+   realOutBuffer = 0.0f;
+   imagOutBuffer = 0.0f;
+   
+   for (unsigned int n = 0; n < NO; n++)
+   {
+     realOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+     imagOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+   }
+   realOutBuffer /= 512;
+   imagOutBuffer /= 512;
+ 
+   newReal[x][y] += realOutBuffer;
+   newImag[x][y] += imagOutBuffer;
+  }
+ }
+ delete [] fft_real;
+ delete [] fft_imag;
 
 }
 
 task<inner> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
 {
+ tunable mBlock;
+ tunable nBlock;
 
+ mappar (int j=0 : NO/nBlock)
+ {
+  mapseq (int i=0 : MO/mBlock)
+  { 
+   ifftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
+  }
+ }
 }
 
 task<leaf> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
 {
-
+ float realOutBuffer;
+ float imagOutBuffer;
+ float *fft_real = new float[MO];
+ float *fft_imag = new float[MO];
+ 
+ for (unsigned int y = 0; y < NN; y++)
+ {
+  for (unsigned int x = 0; x < MN; x++)
+  {
+   for (unsigned int n = 0; n < MO; n++)
+   {
+    float term = (2 * 3.14159 * x * (n + position_x))/512;
+    fft_real[n] = sq_cos(term);
+    fft_imag[n] = sq_sin(term);
+   }
+   
+   realOutBuffer = 0;
+   imagOutBuffer = 0;
+   for (unsigned int n=0; n < MO; n++)
+   {
+    realOutBuffer += (oldReal[x+n][y]*fft_real[n]) - (oldImag[x+n][y]*fft_imag[n]);
+    imagOutBuffer += (oldReal[x+n][y]*fft_real[n]) + (oldImag[x+n][y]*fft_imag[n]);
+   }
+   
+   newReal[x][y] += realOutBuffer;
+   newImag[x][y] += imagOutBuffer;
+  }
+ }
+ delete [] fft_real;
+ delete [] fft_imag;
 }
 
 task<inner> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
 {
+ tunable mBlock;
+ tunable nBlock;
 
+ mappar (int j=0 : NO/nBlock)
+ {
+  mapseq (int i=0 : MO/mBlock)
+  {
+   ifftX(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock], newReal[0;MN][j*nBlock;nBlock],newImag[0;MN][j*nBlock;nBlock], i*mBlock);
+  }
+ }
 }
 
 task<leaf> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout float newReal[MN][NN], inout float newImag[MN][NN], in int position_x)
 {
+ float realOutBuffer;
+ float imagOutBuffer;
+ float *fft_real = new float[MO];
+ float *fft_imag = new float[MO];
+ 
+ for (unsigned int y = 0; y < NN; y++)
+ {
+  for (unsigned int x = 0; x < MN; x++)
+  {
+   for (unsigned int n = 0; n < MO; n++)
+   {
+    float term = (2 * 3.14159 * x * (n + position_x))/512;
+    fft_real[n] = sq_cos(term);
+    fft_imag[n] = sq_sin(term);
+   }
+   
+   realOutBuffer = 0;
+   imagOutBuffer = 0;
+   for (unsigned int n=0; n < MO; n++)
+   {
+    realOutBuffer += (oldReal[x+n][y]*fft_real[n]) - (oldImag[x+n][y]*fft_imag[n]);
+    imagOutBuffer += (oldReal[x+n][y]*fft_real[n]) + (oldImag[x+n][y]*fft_imag[n]);
+   }
+   realOutBuffer /= 512;
+   imagOutBuffer /= 512;
+   
+   newReal[x][y] += realOutBuffer;
+   newImag[x][y] += imagOutBuffer;
+  }
+ }
+ delete [] fft_real;
+ delete [] fft_imag;
 
 }
 
 task<inner> void lowPass(in float oldReal[M][N], in float oldImag[M][N], inout float newReal[M][N], inout float newImag[M][N], in int position_x, in int position_y)
 {
-
+ tunable mBlock;
+ tunable nBlock;
+ 
+ mappar (int i = 0 : M/mBlock, int j = 0 : N/nBlock)
+ {
+  lowPass(oldReal[i*mBlock;mBlock][j*nBlock;nBlock],oldImag[i*mBlock;mBlock][j*nBlock;nBlock],newReal[i*mBlock;mBlock][j*nBlock;nBlock],newImag[i*mBlock;mBlock][j*nBlock;nBlock],i*mBlock,j*nBlock);
+ }
 }
 
 task<leaf> void lowPass(in float oldReal[M][N], in float oldImag[M][N], inout float newReal[M][N], inout float newImag[M][N], in int position_x, in int position_y)
 {
-
+ int eightX = 512/8;
+ int eight7x = 512 - eightX;
+ int eightY = 512/8;
+ int eight7Y = 512 - eightY;
+ 
+ for (unsigned int x = 0; x < M; x++)
+ {
+  for (unsigned int y = 0; y < N; y++)
+  {
+   int ax = position_x + x;
+   int ay = position_y + y;
+   
+   if ( !(ax < eightX && ay < eightY) && !(ax < eightX && ay >= eight7Y) && !(ax >=eight7Y && ay < eightY) && !(ax >= eight7Y && ay >= eight7Y))
+   {
+    newReal[x][y] = 0;
+    newImag[x][y] = 0;
+   }
+  }
+ }
 }
 
