@@ -37,38 +37,125 @@ instance filterImage i1(level 1) inner
 
 instance fftX fftX_1(level 1) inner
 {
-
+ tunable mBlock = 512;
+ tunable nBlock = 512;
+ //footprint (4194304, bytes);
+ data()
+ {
+  array oldReal() { elements = 512, 512;}
+  array oldImag() { elements = 512, 512;}
+  array newReal() { elements = 512, 512;}
+  array newImag() { elements = 512, 512;}   
+ }
+ control (level 0)
+ {
+  loop i() { spmd { fullrange = 0,1; ways = 1; iterblk = 1; }}
+  loop j() { spmd { ways = 1; iterblk = 1; }}
+  callsite fftX() {target fftX_2() {}} 
+ }
 }
+
+instance fftX fftX_2 (level 0) leaf { } 
 
 // IFFTX ......................................................................
 // ............................................................................
 
 instance ifftX ifftX_1(level 1) inner
 {
+ tunable mBlock = 512;
+ tunable nBlock = 512;
 
+ //footprint (4194304, bytes);
+ data()
+ {
+  array oldReal() { elements = 512, 512;}
+  array oldImag() { elements = 512, 512;}
+  array newReal() { elements = 512, 512;}
+  array newImag() { elements = 512, 512;}   
+ }
+ control (level 0)
+ {
+  loop i() { spmd { fullrange = 0,1; ways = 1; iterblk = 1; }}
+  loop j() { spmd { ways = 1; iterblk = 1; }}
+  callsite ifftX() {target ifftX_2() {}} 
+ }
 }
+
+instance ifftX ifftX_2 (level 0) leaf { }
 
 // FFTY .......................................................................
 // ............................................................................
 
 instance fftY fftY_1(level 1) inner
 {
+ tunable mBlock = 512;
+ tunable nBlock = 512;
 
+ //footprint (4194304, bytes);
+ data()
+ {
+  array oldReal() { elements = 512, 512;}
+  array oldImag() { elements = 512, 512;}
+  array newReal() { elements = 512, 512;}
+  array newImag() { elements = 512, 512;}   
+ }
+ control (level 0)
+ {
+  loop i() { spmd { fullrange = 0,1; ways = 1; iterblk = 1; }}
+  loop j() { spmd { ways = 1; iterblk = 1; }}
+  callsite fftY() {target fftY_2() {}} 
+ }
 }
+
+instance fftY fftY_2 (level 0) leaf { }
 
 // IFFTY ......................................................................
 // ............................................................................
 
 instance ifftY ifftY_1(level 1) inner
 {
+ tunable mBlock = 512;
+ tunable nBlock = 512;
 
+ //footprint (4194304, bytes);
+ data()
+ {
+  array oldReal() { elements = 512, 512;}
+  array oldImag() { elements = 512, 512;}
+  array newReal() { elements = 512, 512;}
+  array newImag() { elements = 512, 512;}   
+ }
+ control (level 0)
+ {
+  loop i() { spmd { fullrange = 0,1; ways = 1; iterblk = 1; }}
+  loop j() { spmd { ways = 1; iterblk = 1; }}
+  callsite ifftY() {target ifftY_2() {}} 
+ }
 }
+
+instance ifftY ifftY_2 (level 0) leaf { } 
 
 // LOW PASS ...................................................................
 // ............................................................................
 
 instance lowPass lowPass_1(level 1) inner
 {
-
+ tunable mBlock = 512;
+ tunable nBlock = 512;
+ 
+ data()
+ {
+  array oldReal() { elements = 512,512;}
+  array oldImag() { elements = 512,512;}
+  array newReal() { elements = 512,512;}
+  array newImag() { elements = 512,512;}
+ }
+ control (level 0)
+ {
+  loop i() { spmd { fullrange = 0,1; ways = 1; iterblk = 1; }}
+  loop j() { spmd { ways = 1; iterblk = 1;}}
+  callsite lowPass() {target lowPass_2() {}}
+ }
 } 
 
+instance lowPass lowPass_2 (level 0) leaf { } 
