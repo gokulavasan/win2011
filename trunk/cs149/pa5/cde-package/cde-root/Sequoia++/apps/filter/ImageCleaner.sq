@@ -249,6 +249,11 @@ task<leaf> void lowPass(in float oldReal[M][N], in float oldImag[M][N], inout fl
     newReal[x][y] = 0;
     newImag[x][y] = 0;
    }
+   else
+   {
+    newReal[x][y] = oldReal[x][y];
+    newImag[x][y] = oldImag[x][y];
+   }
   }
  }
 }

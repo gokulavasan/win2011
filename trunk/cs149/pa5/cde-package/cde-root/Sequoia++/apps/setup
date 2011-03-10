@@ -1,2 +1,2 @@
-setenv SQ_LD_DIR ~/pa5/cde-package/cde-root/Sequoia++/libs
-setenv SQ_RT_DIR ~/pa5/cde-package/cde-root/Sequoia++/runtime
+setenv SQ_LD_DIR ~/googlecode/win2011/cs149/pa5/cde-package/cde-root/Sequoia++/libs
+setenv SQ_RT_DIR ~/googlecode/win2011/cs149/pa5/cde-package/cde-root/Sequoia++/runtime
