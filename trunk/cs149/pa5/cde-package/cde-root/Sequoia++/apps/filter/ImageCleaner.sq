@@ -58,11 +58,17 @@ task<leaf> void fftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout f
    for (unsigned int n = 0; n < NO; n++)
    {
      realOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
-     imagOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+     imagOutBuffer += (oldImag[x][y+n]*fft_real[n]) + (oldReal[x][y+n]*fft_imag[n]);
    }
    
-   newReal[x][y] += realOutBuffer;
-   newImag[x][y] += imagOutBuffer;
+   if (position_y == 0)
+   {
+    newReal[x][y] = 0;
+    newReal[x][y] = 0;
+   } 
+    newReal[x][y] += realOutBuffer;
+    newImag[x][y] += imagOutBuffer;
+   
   }
  }
  delete [] fft_real;
@@ -106,11 +112,16 @@ task<leaf> void ifftX(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
    for (unsigned int n = 0; n < NO; n++)
    {
      realOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
-     imagOutBuffer += (oldReal[x][y+n]*fft_real[n]) - (oldImag[x][y+n]*fft_imag[n]);
+     imagOutBuffer += (oldImag[x][y+n]*fft_real[n]) + (oldReal[x][y+n]*fft_imag[n]);
    }
    realOutBuffer /= 512;
    imagOutBuffer /= 512;
- 
+   
+   if (position_y == 0)
+   {
+    newReal[x][y] = 0.0f;
+    newReal[x][y] = 0.0f;
+   } 
    newReal[x][y] += realOutBuffer;
    newImag[x][y] += imagOutBuffer;
   }
@@ -152,14 +163,19 @@ task<leaf> void fftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout f
     fft_imag[n] = sq_sin(term);
    }
    
-   realOutBuffer = 0;
-   imagOutBuffer = 0;
+   realOutBuffer = 0.0f;
+   imagOutBuffer = 0.0f;
    for (unsigned int n=0; n < MO; n++)
    {
     realOutBuffer += (oldReal[x+n][y]*fft_real[n]) - (oldImag[x+n][y]*fft_imag[n]);
-    imagOutBuffer += (oldReal[x+n][y]*fft_real[n]) + (oldImag[x+n][y]*fft_imag[n]);
+    imagOutBuffer += (oldImag[x+n][y]*fft_real[n]) + (oldReal[x+n][y]*fft_imag[n]);
    }
-   
+  
+   if(position_x == 0)
+   {
+    newReal[x][y] = 0.0f;
+    newImag[x][y] = 0.0f;
+   } 
    newReal[x][y] += realOutBuffer;
    newImag[x][y] += imagOutBuffer;
   }
@@ -201,16 +217,20 @@ task<leaf> void ifftY(in float oldReal[MO][NO], in float oldImag[MO][NO], inout 
     fft_imag[n] = sq_sin(term);
    }
    
-   realOutBuffer = 0;
-   imagOutBuffer = 0;
+   realOutBuffer = 0.0f;
+   imagOutBuffer = 0.0f;
    for (unsigned int n=0; n < MO; n++)
    {
     realOutBuffer += (oldReal[x+n][y]*fft_real[n]) - (oldImag[x+n][y]*fft_imag[n]);
-    imagOutBuffer += (oldReal[x+n][y]*fft_real[n]) + (oldImag[x+n][y]*fft_imag[n]);
+    imagOutBuffer += (oldImag[x+n][y]*fft_real[n]) + (oldReal[x+n][y]*fft_imag[n]);
    }
    realOutBuffer /= 512;
    imagOutBuffer /= 512;
-   
+   if (position_x == 0)
+   {
+    newReal[x][y] = 0.0f;
+    newImag[x][y] = 0.0f;
+   } 
    newReal[x][y] += realOutBuffer;
    newImag[x][y] += imagOutBuffer;
   }
