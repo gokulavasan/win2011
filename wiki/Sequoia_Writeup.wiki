@@ -1,1 +1,5 @@
-Sequoia is a pain! Writing one module functioning module in itself  is a big deal. Writing its inner and leaf modules :(
+We have implemented the image filtering algorithm for SMP system. The algorithm itself contains three parts - FFT, masking, inverse FFT. FFT and Inverse FFT are themselves done in two passes along X-dimension and along Y-dimension. The masking is done to remove high frequency components in the image. 
+
+In order to implement it in Sequoia, we had to write the functions by blocking/parametrizing the data. Thus each function FFTX, FFTY, IFFTX, IFFTY, Masking has an inner and leaf functions. The leaf function does the actual computation possibly on a smaller block of the entire image. The inner functions divides the image (row-wise for (I)FFTX and col-wise for (I)FFTY). 
+
+The filtering operation is done by the lowPass function and this is parametrized across both X and Y dimensions. The mapping file was SMP was written and different block sizes and configurations were tried and the image filtering worked just fine.
